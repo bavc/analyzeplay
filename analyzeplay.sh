@@ -14,6 +14,7 @@ usage(){
 	-w		field waveform mode, waveforms per channel per field
 	-v		field vectrscope mode, vectroscopes per field
 	-l		field histogram mode, histograms per field
+	-b		bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
 	-i		highlight interlacement artifacts
 	
 	optional output:
@@ -32,7 +33,7 @@ chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*4:ih[w];[b]lutyuv=u=128:v=12
 interlaceplay="-vf 'kerndeint=map=1'"
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fcdwvilo:h opt ; do
+while getopts fcdwvilb:o:h opt ; do
 	case "$opt" in
 		f) filter="$fieldsplitplay" ;;
 		d) filter="$fielddiffplay" ;;
@@ -41,6 +42,13 @@ while getopts fcdwvilo:h opt ; do
 		v) filter="$fieldvectroscopeplay" ;;
 		i) filter="$interlaceplay" ;;
 		l) filter="$fieldhistogramplay" ;;
+		b)
+			bit="$OPTARG"
+			[[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;}; 
+			bitand=$(echo "2^(8-$bit)" | bc)
+			times=$(echo "2^$bit" | bc)
+			echo "bit $bit"
+			filter="-vf 'split[a][b]; [a]pad=iw:ih*2,field=top,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[src]; [b]field=bottom,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[filt];[src][filt]overlay=0:h'";;
 		o) outputfile="$OPTARG" ;;
 		h) usage ; exit 1 ;;
 		\?) usage ; exit 1 ;;
