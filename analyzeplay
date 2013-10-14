@@ -15,7 +15,7 @@ usage(){
 	-v		field vectrscope mode, vectroscopes per field
 	-l		field histogram mode, histograms per field
 	-b		bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
-	-i		highlight interlacement artifacts
+    -i		highlight interlacement artifacts
 	
 	optional output:
 	-o		outputfile
@@ -30,7 +30,7 @@ fieldwaveformplay="-vf 'split=4[a][b][c][d]; [a]pad=iw*2:ih*4,field=top[top]; [b
 rangewaveformplay="-vf 'split[a][b];[a]format=gray,histogram=mode=waveform:waveform_mode=column,vflip,split[c][d];[b]pad=iw:ih+256[padded];[c]geq=g=1:b=1[red];[d]geq=r=1:b=1,crop=in_w:220:0:16[mid];[red][mid]overlay=0:16[wave];[padded][wave]overlay=0:H-h'"
 fieldhistogramplay="-vf 'split=4[a][b][c][d]; [a]pad=iw*2:ih*4,field=top[top]; [b]field=bottom[bot]; [top][bot]overlay=w[rowa];[c]field=top,histogram,scale=720,pad=iw*2[rowba];[d]field=bottom,histogram,scale=720[rowbb];[rowba][rowbb]overlay=w[rowb];[rowa][rowb]overlay=0:h/2'"
 fieldvectroscopeplay="-vf 'split=4[a][b][c][d]; [a]pad=iw*2:ih*3,field=top[top]; [b]field=bottom[bot]; [top][bot]overlay=w[rowa];[c]field=top,histogram=mode=color,pad=iw*2[rowba];[d]field=bottom,histogram=mode=color[rowbb];[rowba][rowbb]overlay=w[rowb];[rowa][rowb]overlay=0:h'"
-chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*4:ih[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=w*2:0[wxy];[wxy][z]overlay=w*3:0'"
+chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=0:h[wxy];[wxy][z]overlay=w:h'"
 interlaceplay="-vf 'kerndeint=map=1'"
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
