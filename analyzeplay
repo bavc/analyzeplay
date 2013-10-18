@@ -35,7 +35,7 @@ chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=
 interlaceplay="-vf 'kerndeint=map=1'"
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fcdwrRHvilb:o:h opt ; do
+while getopts fcdwrRHvib:o:h opt ; do
 	case "$opt" in
 		f) filter="$fieldsplitplay" ;;
 		d) filter="$fielddiffplay" ;;
@@ -46,7 +46,6 @@ while getopts fcdwrRHvilb:o:h opt ; do
 		H) filter="$fieldhistogramplay" ;;
 		v) filter="$fieldvectroscopeplay" ;;
 		i) filter="$interlaceplay" ;;
-		l) filter="$fieldhistogramplay" ;;
 		b)
 			bit="$OPTARG"
 			[[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;}; 
