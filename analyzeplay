@@ -9,13 +9,16 @@ usage(){
 
 	filter options:
 	-f		split field mode
-	-c		channel split mode
 	-d		field difference mode. midtone gray means no difference in between fields
+	-c		channel split mode
 	-w		field waveform mode, waveforms per channel per field
+	-r		field waveform mode with highlights for broadcast range 
+	-R		waveform in parade mode
+	-H		field histogram mode, histograms per field
 	-v		field vectrscope mode, vectroscopes per field
+	-i		highlight interlacement artifacts
 	-l		field histogram mode, histograms per field
 	-b		bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
-	-i		highlight interlacement artifacts
 
 	optional output:
 	-o		outputfile
