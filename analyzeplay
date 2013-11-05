@@ -7,6 +7,8 @@ usage(){
 
 	usage: $(basename $0) [ filteroption ] [ -o outputfile ] inputfile
 
+    use - (hyphen) for the input if it is a pipe (for instace: bmdcapture -v -F nut -c 2 -s 16 -p 8 -m 0 -f pipe:1 | analyzeplay -c -)
+
 	filter options:
 	-f		split field mode
 	-d		field difference mode. midtone gray means no difference in between fields
@@ -63,7 +65,7 @@ while getopts fcdwrRHvib:o:h opt ; do
 done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
-[ ! -f "$inputfile" ] && { echo No input file detected. ; usage ; exit 1 ;};
+[ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
 [ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay \"$inputfile\" $filter"
 echo "Running: $command"
 eval "$command"
