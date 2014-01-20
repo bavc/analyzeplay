@@ -21,6 +21,10 @@ usage(){
     -i        highlight interlacement artifacts
     -l        field histogram mode, histograms per field
     -b        bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
+    -A        field waveform mode with highlights for broadcast range (draft #2)
+    -B        field waveform mode with highlights for broadcast range on field 1 only
+    -C        field waveform mode with highlights for broadcast range on field 2 only
+    -D        field waveform mode with highlights for broadcast range showing field 1 on top and field 2 on bottom
 
     optional output:
     -o        outputfile
@@ -39,8 +43,17 @@ fieldvectroscopeplay="-vf 'split[a][b];[a]field=top,split[topa][topb];[b]field=b
 chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=0:h[wxy];[wxy][z]overlay=w:h'"
 interlaceplay="-vf 'kerndeint=map=1'"
 
+# Name: Waveform
+# Description: A waveform display. Guide lines are drawn at 7.5 IRE (0x16) and 100 IRE (0xEB). The area above 100 IRE is tinted in crimson and below 7.5 IRE is tinted aqua. These ranges, above 100 IRE and below 7.5 IRE, show luminosity values outside of broadcast range.
+FILTER_WAVEFORM="-vf 'histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
+# Name: Waveform (Field 1 Only)
+FILTER_WAVEFORM_F1="-vf 'field=top,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
+# Name: Waveform (Field 2 Only)
+FILTER_WAVEFORM_F2="-vf 'field=bottom,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
+# Name: Waveform (Field 1 and Field 2 split)
+FILTER_WAVEFORM_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[e];[d]histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fcdwrRHvib:o:h opt ; do
+while getopts fcdwrRHvib:ABCDo:h opt ; do
     case "$opt" in
         f) filter="$fieldsplitplay" ;;
         d) filter="$fielddiffplay" ;;
@@ -58,6 +71,10 @@ while getopts fcdwrRHvib:o:h opt ; do
             times=$(echo "2^$bit" | bc)
             echo "bit $bit"
             filter="-vf 'split[a][b]; [a]pad=iw:ih*2,field=top,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[src]; [b]field=bottom,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[filt];[src][filt]overlay=0:h'";;
+        A) filter="$FILTER_WAVEFORM" ;;
+        B) filter="$FILTER_WAVEFORM_F1" ;;
+        C) filter="$FILTER_WAVEFORM_F2" ;;
+        D) filter="$FILTER_WAVEFORM_FS" ;;
         o) outputfile="$OPTARG" ;;
         h) usage ; exit 1 ;;
         \?) usage ; exit 1 ;;
