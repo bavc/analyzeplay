@@ -31,6 +31,8 @@ usage(){
     -K        vectorscope mode on field 1 only
     -L        vectorscope mode on field 2 only
     -M        vectorscope mode showing field 1 on left and field 2 on right
+    -N        highlight pixels that are labelled as temporal outliers
+    -O        highlight pixels that are labelled as temporal outliers showing field 1 on top and field 2 on bottom
 
     optional output:
     -o        outputfile
@@ -74,8 +76,15 @@ FILTER_VECTORSCOPE_F2="-vf 'field=bottom,histogram=mode=color2,transpose=dir=2,d
 # Name: Vectorscope (field-split)
 FILTER_VECTORSCOPE_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5[e];[d]histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5[f];[e]pad=iw*2[g];[g][f]overlay=w'"
 
+# Name: Temporal Outlier Pixels
+# Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
+FILTER_TOUT="-vf 'values=out=tout'"
+# Name: Broadcast Range (field-split)
+FILTER_TOUT_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]values=out=tout[e];[d]values=out=tout[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
+
+
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fcdwrRHvib:ABCDEFJKLMo:h opt ; do
+while getopts fcdwrRHvib:ABCDEFJKLMNOo:h opt ; do
     case "$opt" in
         f) filter="$fieldsplitplay" ;;
         d) filter="$fielddiffplay" ;;
@@ -103,6 +112,8 @@ while getopts fcdwrRHvib:ABCDEFJKLMo:h opt ; do
         K) filter="$FILTER_VECTORSCOPE_F1" ;;
         L) filter="$FILTER_VECTORSCOPE_F2" ;;
         M) filter="$FILTER_VECTORSCOPE_FS" ;;
+        N) filter="$FILTER_RANG" ;;
+        O) filter="$FILTER_RANG_FS" ;;
         o) outputfile="$OPTARG" ;;
         h) usage ; exit 1 ;;
         \?) usage ; exit 1 ;;
