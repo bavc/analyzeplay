@@ -2,30 +2,30 @@
 [ ! $(which ffplay) ] && { echo ffplay is necessary to run this. Maybe you can install it with: 'brew install --with-ffplay --with-freetext ffmpeg'; exit 1 ;};
 
 usage(){
-	echo "
-	$(basename $0)
+    echo "
+    $(basename $0)
 
-	usage: $(basename $0) [ filteroption ] [ -o outputfile ] inputfile
+    usage: $(basename $0) [ filteroption ] [ -o outputfile ] inputfile
 
     use - (hyphen) for the input if it is a pipe (for instace: bmdcapture -v -F nut -c 2 -s 16 -p 8 -m 0 -f pipe:1 | analyzeplay -c -)
 
-	filter options:
-	-f		split field mode
-	-d		field difference mode. midtone gray means no difference in between fields
-	-c		channel split mode
-	-w		field waveform mode, waveforms per channel per field
-	-r		field waveform mode with highlights for broadcast range 
-	-R		waveform in parade mode
-	-H		field histogram mode, histograms per field
-	-v		field vectrscope mode, vectroscopes per field
-	-i		highlight interlacement artifacts
-	-l		field histogram mode, histograms per field
-	-b		bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
+    filter options:
+    -f        split field mode
+    -d        field difference mode. midtone gray means no difference in between fields
+    -c        channel split mode
+    -w        field waveform mode, waveforms per channel per field
+    -r        field waveform mode with highlights for broadcast range 
+    -R        waveform in parade mode
+    -H        field histogram mode, histograms per field
+    -v        field vectrscope mode, vectroscopes per field
+    -i        highlight interlacement artifacts
+    -l        field histogram mode, histograms per field
+    -b        bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
 
-	optional output:
-	-o		outputfile
+    optional output:
+    -o        outputfile
 
-	"
+    "
 }
 
 # filter recipes
@@ -41,27 +41,27 @@ interlaceplay="-vf 'kerndeint=map=1'"
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 while getopts fcdwrRHvib:o:h opt ; do
-	case "$opt" in
-		f) filter="$fieldsplitplay" ;;
-		d) filter="$fielddiffplay" ;;
-		c) filter="$chromasplitplay" ;;
-		w) filter="$fieldwaveformplay" ;;
-		r) filter="$rangewaveformplay" ;;
-		R) filter="$waveformplayparade" ;;
-		H) filter="$fieldhistogramplay" ;;
-		v) filter="$fieldvectroscopeplay" ;;
-		i) filter="$interlaceplay" ;;
-		b)
-			bit="$OPTARG"
-			[[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;}; 
-			bitand=$(echo "2^(8-$bit)" | bc)
-			times=$(echo "2^$bit" | bc)
-			echo "bit $bit"
-			filter="-vf 'split[a][b]; [a]pad=iw:ih*2,field=top,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[src]; [b]field=bottom,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[filt];[src][filt]overlay=0:h'";;
-		o) outputfile="$OPTARG" ;;
-		h) usage ; exit 1 ;;
-		\?) usage ; exit 1 ;;
-	esac
+    case "$opt" in
+        f) filter="$fieldsplitplay" ;;
+        d) filter="$fielddiffplay" ;;
+        c) filter="$chromasplitplay" ;;
+        w) filter="$fieldwaveformplay" ;;
+        r) filter="$rangewaveformplay" ;;
+        R) filter="$waveformplayparade" ;;
+        H) filter="$fieldhistogramplay" ;;
+        v) filter="$fieldvectroscopeplay" ;;
+        i) filter="$interlaceplay" ;;
+        b)
+            bit="$OPTARG"
+            [[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;}; 
+            bitand=$(echo "2^(8-$bit)" | bc)
+            times=$(echo "2^$bit" | bc)
+            echo "bit $bit"
+            filter="-vf 'split[a][b]; [a]pad=iw:ih*2,field=top,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[src]; [b]field=bottom,lutyuv=y=bitand(val\, $bitand)*$times:u=128:v=128[filt];[src][filt]overlay=0:h'";;
+        o) outputfile="$OPTARG" ;;
+        h) usage ; exit 1 ;;
+        \?) usage ; exit 1 ;;
+    esac
 done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
