@@ -25,6 +25,8 @@ usage(){
     -B        field waveform mode with highlights for broadcast range on field 1 only
     -C        field waveform mode with highlights for broadcast range on field 2 only
     -D        field waveform mode with highlights for broadcast range showing field 1 on top and field 2 on bottom
+    -E        highlight pixels that are outside of broadcast range
+    -F        highlight pixels that are outside of broadcast range showing field 1 on top and field 2 on bottom
 
     optional output:
     -o        outputfile
@@ -50,10 +52,17 @@ FILTER_WAVEFORM="-vf 'histogram=step=16:mode=waveform:waveform_mode=column:wavef
 FILTER_WAVEFORM_F1="-vf 'field=top,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
 # Name: Waveform (Field 2 Only)
 FILTER_WAVEFORM_F2="-vf 'field=bottom,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
-# Name: Waveform (Field 1 and Field 2 split)
+# Name: Waveform (field-split)
 FILTER_WAVEFORM_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[e];[d]histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
+# Name: Broadcast Range Pixels
+# Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
+FILTER_RANG="-vf 'values=out=rang'"
+# Name: Broadcast Range (field-split)
+FILTER_RANG_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]values=out=rang[e];[d]values=out=rang[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
+
+
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fcdwrRHvib:ABCDo:h opt ; do
+while getopts fcdwrRHvib:ABCDEFo:h opt ; do
     case "$opt" in
         f) filter="$fieldsplitplay" ;;
         d) filter="$fielddiffplay" ;;
@@ -75,6 +84,8 @@ while getopts fcdwrRHvib:ABCDo:h opt ; do
         B) filter="$FILTER_WAVEFORM_F1" ;;
         C) filter="$FILTER_WAVEFORM_F2" ;;
         D) filter="$FILTER_WAVEFORM_FS" ;;
+        E) filter="$FILTER_RANG" ;;
+        F) filter="$FILTER_RANG_FS" ;;
         o) outputfile="$OPTARG" ;;
         h) usage ; exit 1 ;;
         \?) usage ; exit 1 ;;
