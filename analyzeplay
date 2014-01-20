@@ -13,8 +13,8 @@ usage(){
     -f        split field mode
     -d        field difference mode. midtone gray means no difference in between fields
     -c        channel split mode
-    -w        field waveform mode, waveforms per channel per field
-    -r        field waveform mode with highlights for broadcast range 
+    -w        field waveform mode, waveforms per channel per field (depreciated and inaccurate)
+    -r        field waveform mode with highlights for broadcast range (depreciated and inaccurate)
     -R        waveform in parade mode
     -H        field histogram mode, histograms per field
     -v        field vectrscope mode, vectroscopes per field
