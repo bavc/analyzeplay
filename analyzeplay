@@ -12,10 +12,7 @@ usage(){
     filter options:
     -f        split field mode
     -d        field difference mode. midtone gray means no difference in between fields
-    -c        channel split mode
     -H        field histogram mode, histograms per field
-    -i        highlight interlacement artifacts
-    -l        field histogram mode, histograms per field
     -b        bit slice playback per field, enter 1 through 8 to show that bit value (only supports the most significant 8 bits)
     -A        field waveform mode with highlights for broadcast range (draft #2)
     -B        field waveform mode with highlights for broadcast range on field 1 only
@@ -38,10 +35,17 @@ usage(){
 
 # filter recipes
 fieldsplitplay="-vf 'split[a][b]; [a]pad=iw:ih*2,field=top[src]; [b]field=bottom[filt]; [src][filt]overlay=0:h'"
-fielddiffplay="-vf 'split=4[a][b][c][d]; [a]pad=iw:ih*3,field=top[src]; [b]field=bottom[filt];[c]field=bottom[bb];[d]field=top,negate[tb];[src][filt]overlay=0:h[upper];[bb][tb]blend=all_mode=average[blend];[upper][blend]overlay=0:h*2'"
-fieldhistogramplay="-vf 'split[a][b];[a]field=top,split[topa][topb];[b]field=bottom,split[bota][botb];[topb]histogram[topbh];[botb]histogram[botbh];[topa]pad=iw*2:ih+636[topapad];[topapad][bota]overlay=w[rowa];[rowa][topbh]overlay=W/2-256:H-636[rowab1];[rowab1][botbh]overlay=W/2:H-636'"
-chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=0:h[wxy];[wxy][z]overlay=w:h'"
-interlaceplay="-vf 'kerndeint=map=1'"
+fielddiffplay="-vf 'split[a][b];[a]field=bottom[bb];[b]field=top,negate[tb];[bb][tb]blend=all_mode=average'"
+
+#depreciated chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=0:h[wxy];[wxy][z]overlay=w:h'"
+#depreciated interlaceplay="-vf 'kerndeint=map=1'"
+
+# Name: Histogram
+# Description: A histogram display for each channel of the input video (typically either in YUV or RBG).
+FILTER_HISTOGRAM="-vf 'histogram'"
+# Name: Histogram (Field Split)
+# Description: A histogram display for each channel of the input video (typically either in YUV or RBG). Field 1 is presented on the left and field 2 on the right.
+FILTER_HISTOGRAM_FS="-vf 'split[a][b];[a]field=top,histogram,pad=iw*2[a2];[b]field=bottom,histogram[b2];[a2][b2]overlay=w'"
 
 # Name: Waveform
 # Description: A waveform display. Guide lines are drawn at 7.5 IRE (0x16) and 100 IRE (0xEB). The area above 100 IRE is tinted in crimson and below 7.5 IRE is tinted aqua. These ranges, above 100 IRE and below 7.5 IRE, show luminosity values outside of broadcast range.
@@ -75,15 +79,36 @@ FILTER_TOUT="-vf 'values=out=tout'"
 # Name: Temporal Outlier Pixels (field-split)
 FILTER_TOUT_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]values=out=tout[e];[d]values=out=tout[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
 
+# Name: Extract Y
+# Description: This filter extracts the Y channel which represents the luminosity data from the video. Only supported on YUV videos.
+FILTER_EXTRACT_Y="-vf extractplanes=y"
+# Name: Extract U
+# Description: This filter extracts the U channel which represents part of the chroma data from the video. Only supported on YUV videos.
+FILTER_EXTRACT_U="-vf extractplanes=u"
+# Name: Extract V
+# Description: This filter extracts the V channel which represents part of the chroma data from the video. Only supported on YUV videos.
+FILTER_EXTRACT_V="-vf extractplanes=v"
+# Name: Extract UV
+# Description: This filter extracts both chroma channels, U and V, and presents them side-by-side. Only supported on YUV videos.
+FILTER_EXTRACT_UV="-vf 'extractplanes=u+v[u][v];[u]pad=iw*2[u2];[u2][v]overlay=w,drawgrid=iw/2:ih:c=blue@0.2:t=1'"
+
+# Name: Extract Y - Equalized
+# Description: This filter extracts the Y channel which represents the luminosity data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+FILTER_EXTRACT_Y_EQ="-vf 'format=yuvj444p,extractplanes=y,histeq=strength=0.2'"
+# Name: Extract U - Equalized
+# Description: This filter extracts the U channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+FILTER_EXTRACT_U_EQ="-vf 'format=yuvj444p,extractplanes=u,histeq=strength=0.2'"
+# Name: Extract V - Equalized
+# Description: This filter extracts the V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+FILTER_EXTRACT_V_EQ="-vf 'format=yuvj444p,extractplanes=v,histeq=strength=0.2'"
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fcdHib:ABCDEFJKLMNOo:h opt ; do
+while getopts fdHib:ABCDEFJKLMNOPQRSTUVWo:h opt ; do
     case "$opt" in
         f) filter="$fieldsplitplay" ;;
         d) filter="$fielddiffplay" ;;
-        c) filter="$chromasplitplay" ;;
-        H) filter="$fieldhistogramplay" ;;
-        i) filter="$interlaceplay" ;;
+        H) filter="$FILTER_HISTOGRAM" ;;
+        W) filter="$FILTER_HISTOGRAM_FS" ;;
         b)
             bit="$OPTARG"
             [[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;}; 
@@ -101,8 +126,15 @@ while getopts fcdHib:ABCDEFJKLMNOo:h opt ; do
         K) filter="$FILTER_VECTORSCOPE_F1" ;;
         L) filter="$FILTER_VECTORSCOPE_F2" ;;
         M) filter="$FILTER_VECTORSCOPE_FS" ;;
-        N) filter="$FILTER_RANG" ;;
-        O) filter="$FILTER_RANG_FS" ;;
+        N) filter="$FILTER_TOUT" ;;
+        O) filter="$FILTER_TOUT_FS" ;;
+        P) filter="$FILTER_EXTRACT_Y" ;;
+        Q) filter="$FILTER_EXTRACT_U" ;;
+        R) filter="$FILTER_EXTRACT_V" ;;
+        S) filter="$FILTER_EXTRACT_UV" ;;
+        T) filter="$FILTER_EXTRACT_Y_EQ" ;;
+        U) filter="$FILTER_EXTRACT_U_EQ" ;;
+        V) filter="$FILTER_EXTRACT_V_EQ" ;;
         o) outputfile="$OPTARG" ;;
         h) usage ; exit 1 ;;
         \?) usage ; exit 1 ;;
