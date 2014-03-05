@@ -113,7 +113,7 @@ while getopts fdHib:ABCDEFJKLMNOPQRSTUVWo:h opt ; do
             # argument: name=bit, range=1-8, default=1, slider
             bit="$OPTARG"
             [[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;};
-            part="lutyuv=y=bitand(val\,pow(2\,8-${bit}))*pow(2\,${bit}):u=128:v=128"
+            filter="-vf 'lutyuv=y=bitand(val\,pow(2\,8-${bit}))*pow(2\,${bit}):u=128:v=128'"
             ;;
         A) filter="$FILTER_WAVEFORM" ;;
         B) filter="$FILTER_WAVEFORM_F1" ;;
