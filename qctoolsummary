@@ -1,0 +1,28 @@
+#!/bin/bash
+# Summarize qctools csv
+# Run like: qctoolsummary movie.qctools.csv
+csv="$1"
+MID8BIT=128
+BROADCASTYHIGH=235
+BROADCASTYLOW=16
+YAVG_COL=24
+YHIGH_COL=25
+YLOW_COL=23
+
+Y_AVERAGE=$(cut -d, -f $YAVG_COL "$csv" | tail -n +2 | awk '{sum+=$1} END { print sum/NR}')
+echo "The average luminosity value (0-255) is: $Y_AVERAGE"
+Y_AVERAGE_OFF=$(echo $Y_AVERAGE - $MID8BIT | bc)
+echo "Distance of average luminosity value to midpoint: $Y_AVERAGE_OFF"
+
+Y_HIGH=$(cut -d, -f $YHIGH_COL "$csv" | tail -n +2 | awk '{sum+=$1} END { print sum/NR}')
+echo "The average 95th percentile luminosity value (0-255) is: $Y_HIGH"
+Y_HIGH_OFF=$(echo $Y_HIGH - $BROADCASTYHIGH | bc)
+echo "Distance from broadcast black limit: $Y_HIGH_OFF"
+
+Y_LOW=$(cut -d, -f $YLOW_COL "$csv" | tail -n +2 | awk '{sum+=$1} END { print sum/NR}')
+echo "The average 10th percentile luminosity value (0-255) is: $Y_LOW"
+Y_LOW_OFF=$(echo $Y_LOW - $BROADCASTYLOW | bc)
+echo "Distance from broadcast black limit: $Y_LOW_OFF"
+
+Y_85LUMA_RANGE=$(echo $Y_HIGH - $Y_LOW | bc)
+echo "The average range of luminosity from 10th to 95th percentile luma values: $Y_85LUMA_RANGE"
