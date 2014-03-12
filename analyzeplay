@@ -34,22 +34,38 @@ usage(){
 }
 
 # filter recipes
-fieldsplitplay="-vf 'split[a][b]; [a]pad=iw:ih*2,field=top[src]; [b]field=bottom[filt]; [src][filt]overlay=0:h'"
-fielddiffplay="-vf 'split[a][b];[a]field=bottom[bb];[b]field=top,negate[tb];[bb][tb]blend=all_mode=average'"
-
-#depreciated chromasplitplay="-vf 'split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=0:h[wxy];[wxy][z]overlay=w:h'"
-#depreciated interlaceplay="-vf 'kerndeint=map=1'"
+fieldsplitplay(){
+    filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab'"
+}
+fielddiffplay(){
+    filter="-vf 'split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average'"
+}
 
 # Name: Histogram
 # Description: A histogram display for each channel of the input video (typically either in YUV or RBG).
-FILTER_HISTOGRAM="-vf 'histogram'"
+histogram(){
+    filter="-vf 'histogram'"
+}
 # Name: Histogram (Field Split)
 # Description: A histogram display for each channel of the input video (typically either in YUV or RBG). Field 1 is presented on the left and field 2 on the right.
-FILTER_HISTOGRAM_FS="-vf 'split[a][b];[a]field=top,histogram,pad=iw*2[a2];[b]field=bottom,histogram[b2];[a2][b2]overlay=w'"
+histogram_fs(){
+    filter="-vf 'split[a][b];[a]field=top,histogram[a1];[b]field=bottom,histogram[b1];[a1][b1]framepack'"
+}
 
-# Name: Waveform
-# Description: A waveform display. Guide lines are drawn at 7.5 IRE (0x16) and 100 IRE (0xEB). The area above 100 IRE is tinted in crimson and below 7.5 IRE is tinted aqua. These ranges, above 100 IRE and below 7.5 IRE, show luminosity values outside of broadcast range.
-FILTER_WAVEFORM="-vf 'histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
+waveform(){
+    # Name: Waveform
+    # Description: A waveform display. Guide lines are drawn at 7.5 IRE (0x16) and 100 IRE (0xEB). The area above 100 IRE is tinted in crimson and below 7.5 IRE is tinted aqua. These ranges, above 100 IRE and below 7.5 IRE, show luminosity values outside of broadcast range.
+    # arg1: scale, range=1..255, default=10, slider
+    [[ $1 -ge 1 && $1 -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
+    filter="-vf 'histogram=step=$1:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+    crop=iw:256:0:0,\
+    drawgrid=width=720:height=21:thickness=1:color=white@0.5,\
+    drawgrid=y=(256-16):c=white@0.4,\
+    drawgrid=y=(256-235):c=white@0.4,\
+    drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,\
+    drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,\
+    scale=720x512'"
+}
 # Name: Waveform (Field 1 Only)
 FILTER_WAVEFORM_F1="-vf 'field=top,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,scale=720x486'"
 # Name: Waveform (Field 2 Only)
@@ -57,83 +73,249 @@ FILTER_WAVEFORM_F2="-vf 'field=bottom,histogram=step=16:mode=waveform:waveform_m
 # Name: Waveform (field-split)
 FILTER_WAVEFORM_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[e];[d]histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
 
+FILTER_WAVEFORM_HORIZ="-vf 'transpose=1,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16'"
+FILTER_WAVEFORM_HORIZ_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]transpose=1,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[e];[d]transpose=1,histogram=step=16:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawgrid=y=(256-16):c=white@0.4,drawgrid=y=(256-235):c=white@0.4,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
+
 # Name: Broadcast Range Pixels
 # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
 FILTER_RANG="-vf 'values=out=rang'"
 # Name: Broadcast Range (field-split)
 FILTER_RANG_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]values=out=rang[e];[d]values=out=rang[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
 
-# Name: Vectorscope
-# Description: A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.
-FILTER_VECTORSCOPE="-vf 'histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5,scale=486:486'"
-# Name: Vectorscope (Field 1 Only)
-FILTER_VECTORSCOPE_F1="-vf 'field=top,histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5,scale=486:486'"
-# Name: Vectorscope (Field 2 Only)
-FILTER_VECTORSCOPE_F2="-vf 'field=bottom,histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5,scale=486:486'"
-# Name: Vectorscope (field-split)
-FILTER_VECTORSCOPE_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5[e];[d]histogram=mode=color2,transpose=dir=2,drawgrid=w=16:h=16:t=1:c=white@0.2,drawgrid=w=128:h=128:t=1:c=white@0.3,drawgrid=w=4:h=4:t=1:c=white@0.1,drawbox=w=5:h=5:t=1:x=90-2:y=256-240-3:c=red@0.5,drawbox=w=5:h=5:t=1:x=54-2:y=256-34-3:c=green@0.5,drawbox=w=5:h=5:t=1:x=240-2:y=256-110-3:c=blue@0.5,drawbox=w=5:h=5:t=1:x=166-2:y=256-16-3:c=cyan@0.5,drawbox=w=5:h=5:t=1:x=202-2:y=256-222-3:c=magenta@0.5,drawbox=w=5:h=5:t=1:x=16-2:y=256-146-3:c=yellow@0.5[f];[e]pad=iw*2[g];[g][f]overlay=w'"
+vectorscope(){
+    # Name: Vectorscope
+    # Description: A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.
+    # arg1: scale, range=1..10, default=1, slider
+    [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
+    filter="-vf 'histogram=mode=color2,lutyuv=y=val*$1,\
+    transpose=dir=2,\
+    scale=512:512,\
+    drawgrid=w=32:h=32:t=1:c=white@0.2,\
+    drawgrid=w=256:h=256:t=1:c=white@0.3,\
+    drawgrid=w=8:h=8:t=1:c=white@0.1,\
+    drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,\
+    drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,\
+    drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,\
+    drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,\
+    drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,\
+    drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,\
+    drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,\
+    drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,\
+    drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,\
+    drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,\
+    drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,\
+    drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,\
+    drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8'"
+}
 
-# Name: Temporal Outlier Pixels
-# Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
-FILTER_TOUT="-vf 'values=out=tout'"
-# Name: Temporal Outlier Pixels (field-split)
-FILTER_TOUT_FS="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]values=out=tout[e];[d]values=out=tout[f];[e]pad=0:ih*2[g];[g][f]overlay=0:h'"
+vectorscope_f1(){
+    # Name: Vectorscope (Field 1)
+    # arg1: scale, range=1..10, default=1, slider
+    [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
+    filter="-vf 'field=top,histogram=mode=color2,lutyuv=y=val*$1,\
+    transpose=dir=2,\
+    scale=512:512,\
+    drawgrid=w=32:h=32:t=1:c=white@0.2,\
+    drawgrid=w=256:h=256:t=1:c=white@0.3,\
+    drawgrid=w=8:h=8:t=1:c=white@0.1,\
+    drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,\
+    drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,\
+    drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,\
+    drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,\
+    drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,\
+    drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,\
+    drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,\
+    drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,\
+    drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,\
+    drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,\
+    drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,\
+    drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,\
+    drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8'"
+}
 
-# Name: Extract Y
-# Description: This filter extracts the Y channel which represents the luminosity data from the video. Only supported on YUV videos.
-FILTER_EXTRACT_Y="-vf extractplanes=y"
-# Name: Extract U
-# Description: This filter extracts the U channel which represents part of the chroma data from the video. Only supported on YUV videos.
-FILTER_EXTRACT_U="-vf extractplanes=u"
-# Name: Extract V
-# Description: This filter extracts the V channel which represents part of the chroma data from the video. Only supported on YUV videos.
-FILTER_EXTRACT_V="-vf extractplanes=v"
-# Name: Extract UV
-# Description: This filter extracts both chroma channels, U and V, and presents them side-by-side. Only supported on YUV videos.
-FILTER_EXTRACT_UV="-vf 'extractplanes=u+v[u][v];[u]pad=iw*2[u2];[u2][v]overlay=w,drawgrid=iw/2:ih:c=blue@0.2:t=1'"
+vectorscope_f2(){
+    # Name: Vectorscope (Field 2)
+    # arg1: scale, range=1..10, default=1, slider
+    [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
+    filter="-vf 'field=bottom,histogram=mode=color2,lutyuv=y=val*$1,\
+    transpose=dir=2,\
+    scale=512:512,\
+    drawgrid=w=32:h=32:t=1:c=white@0.2,\
+    drawgrid=w=256:h=256:t=1:c=white@0.3,\
+    drawgrid=w=8:h=8:t=1:c=white@0.1,\
+    drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,\
+    drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,\
+    drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,\
+    drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,\
+    drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,\
+    drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,\
+    drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,\
+    drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,\
+    drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,\
+    drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,\
+    drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,\
+    drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,\
+    drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8'"
+}
 
-# Name: Extract Y - Equalized
-# Description: This filter extracts the Y channel which represents the luminosity data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
-FILTER_EXTRACT_Y_EQ="-vf 'format=yuvj444p,extractplanes=y,histeq=strength=0.2'"
-# Name: Extract U - Equalized
-# Description: This filter extracts the U channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
-FILTER_EXTRACT_U_EQ="-vf 'format=yuvj444p,extractplanes=u,histeq=strength=0.2'"
-# Name: Extract V - Equalized
-# Description: This filter extracts the V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
-FILTER_EXTRACT_V_EQ="-vf 'format=yuvj444p,extractplanes=v,histeq=strength=0.2'"
+vectorscope_fs(){
+    # Name: Vectorscope (Field Split)
+    # arg1: scale, range=1..10, default=1, slider
+    [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
+    filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+    [a1]histogram=mode=color2,lutyuv=y=val*$1,\
+    transpose=dir=2,\
+    scale=512:512,\
+    drawgrid=w=32:h=32:t=1:c=white@0.2,\
+    drawgrid=w=256:h=256:t=1:c=white@0.3,\
+    drawgrid=w=8:h=8:t=1:c=white@0.1,\
+    drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,\
+    drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,\
+    drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,\
+    drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,\
+    drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,\
+    drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,\
+    drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,\
+    drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,\
+    drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,\
+    drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,\
+    drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,\
+    drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,\
+    drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[a2];\
+    [b1]histogram=mode=color2,lutyuv=y=val*$1,\
+    transpose=dir=2,\
+    scale=512:512,\
+    drawgrid=w=32:h=32:t=1:c=white@0.2,\
+    drawgrid=w=256:h=256:t=1:c=white@0.3,\
+    drawgrid=w=8:h=8:t=1:c=white@0.1,\
+    drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,\
+    drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,\
+    drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,\
+    drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,\
+    drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,\
+    drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,\
+    drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,\
+    drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,\
+    drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,\
+    drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,\
+    drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,\
+    drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,\
+    drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
+    drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];\
+    [a2][b2]framepack'"
+}
+
+tout(){
+    # Name: Temporal Outlier Pixels
+    # Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
+    filter="-vf 'values=out=tout'"
+}
+
+tout_fs(){
+    # Name: Temporal Outlier Pixels (field-split)
+    filter="-vf 'split[a][b];[a]field=top[c];[b]field=bottom[d];[c]values=out=tout[e];[d]values=out=tout[f];[e][f]framepack=tab'"
+}
+
+extract_plane_uv(){
+    filter="-vf 'extractplanes=u+v,framepack'"
+}
+
+extract_plane_uv_eq(){
+    # arg1: strength, range=0..1, default=0.2, slider
+    # arg1: intensity, range=0..1, default=0.2, slider
+    [[ $1 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
+    [[ $2 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
+    filter="-vf 'extractplanes=u+v,framepack,histeq=strength=$1:strength=$2'"
+}
+
+extract_plane(){
+    # Name: Extract Plane
+    # Description: This filter extracts a video plane which represents the luma or part of the chroma data from the video.
+    # arg1: plane, select of (y, u, or v), default=v, radio buttons
+    [[ $(echo $1 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
+    filter="-vf 'format=yuv444p,extractplanes=$1'"
+}
+
+extract_plane_eq(){
+    # Name: Extract Plane - Equalized
+    # Description: This filter extracts a video plane which represents the luma or part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+    # arg1: plane, select of (y, u, or v), default=v, radio buttons
+    # arg2: strength, range=0..1, default=0.2, slider
+    # arg3: intensity, range=0..1, default=0.2, slider
+    [[ $(echo $1 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
+    [[ $2 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
+    [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
+    filter="-vf 'format=yuv444p,extractplanes=$1,histeq=strength=$2:strength=$3'"
+}
+
+bitslice(){
+    # description: Set the bit position for each plane for display for presentation. Setting -1 means to only send 0x80 for that plane, whereas setting 0 means to send the original plane.
+    # arg1: y bit position, range=-1..8, default=1, slider
+    # arg2: u bit position, range=-1..8, default=0, slider
+    # arg3: v bit position, range=-1..8, default=0, slider
+    [[ $1 -ge -1 && $1 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
+    [[ $2 -ge -1 && $2 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
+    [[ $3 -ge -1 && $3 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
+    filter="-vf 'lutyuv=\
+        y=if(eq($1\,-1)\,128\,if(eq($1\,0)\,val\,bitand(val\,pow(2\,8-$1))*pow(2\,$1))):\
+        u=if(eq($2\,-1)\,128\,if(eq($2\,0)\,val\,bitand(val\,pow(2\,8-$2))*pow(2\,$2))):\
+        v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3)))'"
+}
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fdHib:ABCDEFJKLMNOPQRSTUVWo:h opt ; do
+while getopts fdHib:A:BCDEFJ:K:L:M:NOP:QR:STUV:WXYo:h opt ; do
     case "$opt" in
-        f) filter="$fieldsplitplay" ;;
-        d) filter="$fielddiffplay" ;;
-        H) filter="$FILTER_HISTOGRAM" ;;
-        W) filter="$FILTER_HISTOGRAM_FS" ;;
+        f) fieldsplitplay ;;
+        d) fielddiffplay ;;
+        H) histogram ;;
+        W) histogram_fs ;;
         b)
-            # argument: name=bit, range=1-8, default=1, slider
-            bit="$OPTARG"
-            [[ "$bit" == [1-8] ]] || { echo The bit value must be between 1 and 8 ; exit 1 ;};
-            filter="-vf 'lutyuv=y=bitand(val\,pow(2\,8-${bit}))*pow(2\,${bit}):u=128:v=128'"
+            [[ $(echo $OPTARG | grep "\-\?[0-8]+-\?[0-8]+-\?[0-8]") ]] || { echo The bits slice expression must be expression in y+u+v format, such as -b 1+2+3 to show the first bit only of the y plane, second bit of the u plane, and third bit of the v plane. Any value may be set to zero to disable bits or set to -1 to pass all bits. ; exit 1 ;};
+            bity=$(echo $OPTARG | cut -d+ -f1)
+            bitu=$(echo $OPTARG | cut -d+ -f2)
+            bitv=$(echo $OPTARG | cut -d+ -f3)
+            bitslice $bity $bitu $bitv
             ;;
-        A) filter="$FILTER_WAVEFORM" ;;
+        A) waveform $OPTARG ;;
         B) filter="$FILTER_WAVEFORM_F1" ;;
         C) filter="$FILTER_WAVEFORM_F2" ;;
         D) filter="$FILTER_WAVEFORM_FS" ;;
         E) filter="$FILTER_RANG" ;;
         F) filter="$FILTER_RANG_FS" ;;
-        J) filter="$FILTER_VECTORSCOPE" ;;
-        K) filter="$FILTER_VECTORSCOPE_F1" ;;
-        L) filter="$FILTER_VECTORSCOPE_F2" ;;
-        M) filter="$FILTER_VECTORSCOPE_FS" ;;
-        N) filter="$FILTER_TOUT" ;;
-        O) filter="$FILTER_TOUT_FS" ;;
-        P) filter="$FILTER_EXTRACT_Y" ;;
-        Q) filter="$FILTER_EXTRACT_U" ;;
-        R) filter="$FILTER_EXTRACT_V" ;;
-        S) filter="$FILTER_EXTRACT_UV" ;;
-        T) filter="$FILTER_EXTRACT_Y_EQ" ;;
-        U) filter="$FILTER_EXTRACT_U_EQ" ;;
-        V) filter="$FILTER_EXTRACT_V_EQ" ;;
+        J) vectorscope $OPTARG ;;
+        K) vectorscope_f1 $OPTARG ;;
+        L) vectorscope_f2 $OPTARG ;;
+        M) vectorscope_fs $OPTARG ;;
+        N) tout ;;
+        O) tout_fs ;;
+        P) extract_plane $OPTARG ;;
+        Q) extract_plane_uv ;;
+        R) 
+            strength=$(echo $OPTARG | cut -d+ -f1)
+            intensity=$(echo $OPTARG | cut -d+ -f1)
+            extract_plane_uv_eq ${strength:-0.2} ${intensity:-0.2} ;;
+        V) 
+            plane=$(echo $OPTARG | cut -d+ -f1)
+            strength=$(echo $OPTARG | cut -d+ -f2)
+            intensity=$(echo $OPTARG | cut -d+ -f3)
+            extract_plane_eq ${plane:-v} ${strength:-0.2} ${intensity:-0.2}
+            ;;
+        X) filter="$FILTER_WAVEFORM_HORIZ" ;;
+        Y) filter="$FILTER_WAVEFORM_HORIZ_FS" ;;
         o) outputfile="$OPTARG" ;;
         h) usage ; exit 1 ;;
         \?) usage ; exit 1 ;;
@@ -142,6 +324,6 @@ done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
 [ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
-[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay \"$inputfile\" $filter"
+[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="/Users/drice/Desktop/newff/FFmpeg/ffplay -v verbose \"$inputfile\" $filter"
 echo "Running: $command"
 eval "$command"
