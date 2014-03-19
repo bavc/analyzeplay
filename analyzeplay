@@ -30,10 +30,12 @@ usage(){
 
 # filter recipes
 fieldsplitplay(){
+    # Name: Field Split
     filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab'"
 }
 
 fielddiffplay(){
+    # Name: Field Difference
     filter="-vf 'split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average'"
 }
 
@@ -126,21 +128,6 @@ waveform(){
     fi
 }
 
-rang(){
-    # Name: Broadcast Range Pixels
-    # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
-    # arg1: fieldsplit, boolean, default=N, toggle
-    if [ "$1" = "N" ] ; then
-        filter="-vf 'values=out=rang'"
-    elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];\
-        [b]field=bottom[b1];\
-        [a1]values=out=rang[a2];\
-        [b1]values=out=rang[b2];\
-        [a2][b2]framepack=tab'"
-    fi
-}
-
 vectorscope(){
     # Name: Vectorscope
     # Description: A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.
@@ -216,22 +203,6 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];\
-        [a2][b2]framepack=tab'"
-    fi
-}
-
-tout(){
-    # Name: Temporal Outlier Pixels
-    # Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
-    # arg1: fieldsplit, boolean, default=N, toggle
-    if [ "$1" = "N" ] ; then
-        filter="-vf 'values=out=tout'"
-    elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
-        [a]field=top[a1];\
-        [b]field=bottom[b1];\
-        [a1]values=out=tout[a2];\
-        [b1]values=out=tout[b2];\
         [a2][b2]framepack=tab'"
     fi
 }
@@ -320,6 +291,37 @@ bitslice(){
         y=if(eq($1\,-1)\,128\,if(eq($1\,0)\,val\,bitand(val\,pow(2\,8-$1))*pow(2\,$1))):\
         u=if(eq($2\,-1)\,128\,if(eq($2\,0)\,val\,bitand(val\,pow(2\,8-$2))*pow(2\,$2))):\
         v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3)))'"
+}
+
+rang(){
+    # Name: Broadcast Range Pixels
+    # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
+    # arg1: fieldsplit, boolean, default=N, toggle
+    if [ "$1" = "N" ] ; then
+        filter="-vf 'values=out=rang'"
+    elif [ "$1" = "Y" ] ; then
+        filter="-vf 'split[a][b];[a]field=top[a1];\
+        [b]field=bottom[b1];\
+        [a1]values=out=rang[a2];\
+        [b1]values=out=rang[b2];\
+        [a2][b2]framepack=tab'"
+    fi
+}
+
+tout(){
+    # Name: Temporal Outlier Pixels
+    # Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
+    # arg1: fieldsplit, boolean, default=N, toggle
+    if [ "$1" = "N" ] ; then
+        filter="-vf 'values=out=tout'"
+    elif [ "$1" = "Y" ] ; then
+        filter="-vf 'split[a][b];\
+        [a]field=top[a1];\
+        [b]field=bottom[b1];\
+        [a1]values=out=tout[a2];\
+        [b1]values=out=tout[b2];\
+        [a2][b2]framepack=tab'"
+    fi
 }
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
