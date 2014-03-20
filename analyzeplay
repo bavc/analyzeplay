@@ -324,8 +324,38 @@ tout(){
     fi
 }
 
+vrep(){
+    # Name: Veritcal Repetition Pixels
+    # arg1: fieldsplit, boolean, default=N, toggle
+    if [ "$1" = "N" ] ; then
+        filter="-vf 'signalstats=out=vrep'"
+    elif [ "$1" = "Y" ] ; then
+        filter="-vf 'split[a][b];\
+        [a]field=top[a1];\
+        [b]field=bottom[b1];\
+        [a1]signalstats=out=vrep[a2];\
+        [b1]signalstats=out=vrep[b2];\
+        [a2][b2]framepack=tab'"
+    fi
+}
+
+head(){
+    # Name: Head Switch Pixels
+    # arg1: fieldsplit, boolean, default=N, toggle
+    if [ "$1" = "N" ] ; then
+        filter="-vf 'signalstats=out=head'"
+    elif [ "$1" = "Y" ] ; then
+        filter="-vf 'split[a][b];\
+        [a]field=top[a1];\
+        [b]field=bottom[b1];\
+        [a1]signalstats=out=head[a2];\
+        [b1]signalstats=out=head[b2];\
+        [a2][b2]framepack=tab'"
+    fi
+}
+
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fdH:b:A:E:J:N:P:Q:R:V:o:h opt ; do
+while getopts fdH:b:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d) fielddiffplay ;;
@@ -353,6 +383,12 @@ while getopts fdH:b:A:E:J:N:P:Q:R:V:o:h opt ; do
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             scale=$(echo $OPTARG | cut -d+ -f2)
             vectorscope ${fieldsplit:-N} ${scale:-10}
+            ;;
+        L)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
+            head ${fieldsplit:-N}
+            ;;
+        M)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
+            vrep ${fieldsplit:-N}
             ;;
         N)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             tout ${fieldsplit:-N}
