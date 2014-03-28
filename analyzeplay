@@ -62,6 +62,7 @@ waveform(){
     if [ "$1" = "N" -a "$3" = "N" -a "$4" = "N" ] ; then
         filter="-vf 'histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
+        lutrgb=r=if(gt(val\,16)\,52):g=if(gt(val\,16)\,236):b=if(gt(val\,16)\,166),\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.2:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.2:t=16,\
         scale=iw:512'"
