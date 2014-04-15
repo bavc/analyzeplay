@@ -39,6 +39,22 @@ fielddiffplay(){
     filter="-vf 'split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average'"
 }
 
+waveletnoise(){
+    filter="-vf split[a][b],[a]owdenoise[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
+}
+
+dctnoise(){
+    filter="-vf split[a][b],[a]dctdnoiz[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
+}
+
+deshakediff(){
+    filter="-vf split[a][b],[a]deshake=edge=2[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
+}
+
+horizoffset(){
+    filter="-vf 'split[a][b];[a]crop=iw/2:ih:iw/2:0,setpts=PTS-STARTPTS[a1];[b]crop=iw/2:ih:0:0,setpts=PTS+10/TB[b1];[a1][b1]framepack'"
+}
+
 histogram(){
     # Name: Histogram
     # Description: A histogram display for each channel of the input video (typically either in YUV or RBG).
@@ -294,6 +310,49 @@ bitslice(){
         v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3)))'"
 }
 
+valueslice(){
+    # description: Highlight a select value for each plane.
+    # arg1: y value, range=-0..255, default=128, slider
+    # arg2: u value, range=-0..255, default=128, slider
+    # arg3: v value, range=-0..255, default=128, slider
+    [[ $1 -ge 0 && $1 -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
+    [[ $2 -ge 0 && $2 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
+    [[ $3 -ge 0 && $3 -le 255 ]] || { echo The v value must be between 0 and 255 ; exit 1 ;};
+    filter="-vf 'lutyuv=\
+        y=if(eq(val\,$1)\,255\,val):\
+        u=if(eq(val\,$2)\,255\,val):\
+        v=if(eq(val\,$3)\,255\,val)'"
+}
+
+valueselect(){
+    # description: Highlight a select value for each plane.
+    # arg1: plane, select of (y, u, or v), default=v, radio buttons
+    # arg2: u value, range=-0..255, default=128, slider
+    # arg3: v value, range=-0..255, default=128, slider
+    [[ $(echo $1 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
+    [[ $2 -ge 0 && $2 -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
+    [[ $3 -ge 0 && $3 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
+    #filter="-vf 'lutyuv=$1=if(between(val\,$2\,$3)\,255\,val)'"
+    filter="-vf 'geq=$1=if(between(val\,$2\,$3)\,255\,val)'"
+}
+
+chroma_adjust(){
+    # description: Chroma Adjust
+    # arg1: fieldsplit, boolean, default=N, toggle
+    # arg2: hue, range=0..360, default=0, slider
+    # arg3: saturation, range=-10..10, default=1, slider
+    if [ "$1" = "N" ] ; then
+        filter="-vf 'hue=h=$2:s=$3'"
+    elif [ "$1" = "Y" ] ; then
+        filter="-vf 'split[a][b];[a]field=top[a1];\
+        [b]field=bottom[b1];\
+        [a1]hue=h=$2:s=$3[a2];\
+        [b1]hue=h=$2:s=$3[b2];\
+        [a2][b2]framepack=tab'"
+    fi
+
+}
+
 rang(){
     # Name: Broadcast Range Pixels
     # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
@@ -355,8 +414,15 @@ head(){
     fi
 }
 
+# filter recipes
+showspectrum(){
+    # Name: Field Split
+    filter="-af 'showspectrum'"
+}
+
+
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fdH:b:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
+while getopts fH:b:c:degijkm:q:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d) fielddiffplay ;;
@@ -369,6 +435,29 @@ while getopts fdH:b:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             bitu=$(echo $OPTARG | cut -d+ -f2)
             bitv=$(echo $OPTARG | cut -d+ -f3)
             bitslice $bity $bitu $bitv
+            ;;
+        c)
+            valy=$(echo $OPTARG | cut -d+ -f1)
+            valu=$(echo $OPTARG | cut -d+ -f2)
+            valv=$(echo $OPTARG | cut -d+ -f3)
+            valueslice $valy $valu $valv
+            ;;
+        q)
+            channel=$(echo $OPTARG | cut -d+ -f1)
+            valmin=$(echo $OPTARG | cut -d+ -f2)
+            valmax=$(echo $OPTARG | cut -d+ -f3)
+            valueselect $channel $valmin $valmax
+            ;;
+        e)  waveletnoise ;;
+        g)  dctnoise ;;
+        i)  deshakediff ;;
+        j)  horizoffset ;;
+        k)  showspectrum ;;
+        m) 
+            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
+            hue=$(echo $OPTARG | cut -d+ -f2)
+            sat=$(echo $OPTARG | cut -d+ -f3)
+            chroma_adjust $fieldsplit $hue $sat
             ;;
         A)
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
@@ -422,6 +511,6 @@ done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
 [ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
-[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="/Users/drice/Desktop/newff/FFmpeg/ffplay \"$inputfile\" $filter"
+[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="/Users/drice/Desktop/hide/newff/FFmpeg/ffplay \"$inputfile\" $filter"
 echo "Running: $command"
 eval "$command"
