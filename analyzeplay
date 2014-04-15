@@ -335,7 +335,7 @@ valuehighlight(){
     filter="-vf 'extractplanes=$1,lutrgb=r=if(between(val\,$2\,$3)\,255\,val):g=if(between(val\,$2\,$3)\,255\,val):b=if(between(val\,$2\,$3)\,0\,val)'"
 }
 
-chroma_adjust(){
+chromaadjust(){
     # description: Chroma Adjust
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: hue, range=0..360, default=0, slider
@@ -455,7 +455,7 @@ while getopts fH:b:c:degijkm:q:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             hue=$(echo $OPTARG | cut -d+ -f2)
             sat=$(echo $OPTARG | cut -d+ -f3)
-            chroma_adjust $fieldsplit $hue $sat
+            chromaadjust $fieldsplit $hue $sat
             ;;
         A)
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
