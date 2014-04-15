@@ -331,8 +331,7 @@ valueselect(){
     [[ $(echo $1 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
     [[ $2 -ge 0 && $2 -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
     [[ $3 -ge 0 && $3 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
-    #filter="-vf 'lutyuv=$1=if(between(val\,$2\,$3)\,255\,val)'"
-    filter="-vf 'geq=$1=if(between(val\,$2\,$3)\,255\,val)'"
+    filter="-vf 'extractplanes=$1,lutrgb=r=if(between(val\,$2\,$3)\,255\,val):g=if(between(val\,$2\,$3)\,255\,val):b=if(between(val\,$2\,$3)\,0\,val)'"
 }
 
 chroma_adjust(){
