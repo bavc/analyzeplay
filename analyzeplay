@@ -91,7 +91,7 @@ waveform(){
     # Name: Waveform
     # Description: A waveform display. Guide lines are drawn at 7.5 IRE (0x16) and 100 IRE (0xEB). The area above 100 IRE is tinted in crimson and below 7.5 IRE is tinted aqua. These ranges, above 100 IRE and below 7.5 IRE, show luminosity values outside of broadcast range.
     # arg1: fieldsplit, boolean, default=N, toggle
-    # arg2: scale, range=1..255, default=10, slider
+    # arg2: scale, range=1..255, default=20, slider
     # arg3: parade, boolean, default=N, toggle
     # arg3: horizontal, boolean, default=N, toggle
     [[ "${2}" -ge 1 && "${2}" -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
