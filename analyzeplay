@@ -394,13 +394,14 @@ rang(){
     # Name: Broadcast Range Pixels
     # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
     # arg1: fieldsplit, boolean, default=N, toggle
+    # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=rang"
+        filter="signalstats=out=rang:c=$2"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=rang[a2];\
-        [b1]signalstats=out=rang[b2];\
+        [a1]signalstats=out=rang:c=$2[a2];\
+        [b1]signalstats=out=rang:c=$2[b2];\
         [a2][b2]framepack=tab"
     fi
 }
@@ -409,14 +410,15 @@ tout(){
     # Name: Temporal Outlier Pixels
     # Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
     # arg1: fieldsplit, boolean, default=N, toggle
+    # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=tout"
+        filter="signalstats=out=tout:c=$2"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=tout[a2];\
-        [b1]signalstats=out=tout[b2];\
+        [a1]signalstats=out=tout:c=$2[a2];\
+        [b1]signalstats=out=tout:c=$2[b2];\
         [a2][b2]framepack=tab"
     fi
 }
@@ -424,14 +426,15 @@ tout(){
 vrep(){
     # Name: Veritcal Repetition Pixels
     # arg1: fieldsplit, boolean, default=N, toggle
+    # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=vrep"
+        filter="signalstats=out=vrep:c=$2"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=vrep[a2];\
-        [b1]signalstats=out=vrep[b2];\
+        [a1]signalstats=out=vrep:c=$2[a2];\
+        [b1]signalstats=out=vrep:c=$2[b2];\
         [a2][b2]framepack=tab"
     fi
 }
@@ -440,14 +443,15 @@ head(){
     # skip
     # Name: Head Switch Pixels
     # arg1: fieldsplit, boolean, default=N, toggle
+    # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=head"
+        filter="signalstats=out=head:c=$2"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=head[a2];\
-        [b1]signalstats=out=head[b2];\
+        [a1]signalstats=out=head:c=$2[a2];\
+        [b1]signalstats=out=head:c=$2[b2];\
         [a2][b2]framepack=tab"
     fi
 }
@@ -470,10 +474,15 @@ showcqt(){
     filter="showcqt=fullhd=0"
 }
 
+avectorscope(){
+    # arg1: samples per column, non neg integer, default=2, maybe limit to 20, spinbox
+    filter="avectorscope=m=lissajous:s=512x512"
+}
+
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:egijkl:m:npq:r:s:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
+while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -539,7 +548,8 @@ while getopts fH:b:c:d:egijkl:m:npq:r:s:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             waveform ${fieldsplit:-N} ${scale:-20} ${parade:-N} ${horizontal:-V}
             ;;
         E)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            rang ${fieldsplit:-N}
+            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+            rang ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         J)
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
@@ -547,13 +557,16 @@ while getopts fH:b:c:d:egijkl:m:npq:r:s:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             vectorscope ${fieldsplit:-N} ${scale:-10}
             ;;
         L)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            head ${fieldsplit:-N}
+            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+            head ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         M)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            vrep ${fieldsplit:-N}
+            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+            vrep ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         N)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            tout ${fieldsplit:-N}
+            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+            tout ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         P)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             plane=$(echo $OPTARG | cut -d+ -f2)
