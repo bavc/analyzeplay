@@ -488,7 +488,8 @@ while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
         g)  dctnoise ;;
         i)  deshakediff ;;
         j)  horizoffset ;;
-        k)  showspectrum ;;
+        k)  movietype="amovie"
+            showspectrum ;;
         m) 
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             hue=$(echo $OPTARG | cut -d+ -f2)
