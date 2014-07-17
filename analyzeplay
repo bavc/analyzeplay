@@ -455,11 +455,15 @@ showwaves(){
     filter="showwaves=mode=line:n=$1"
 }
 
+showcqt(){
+    # arg1: samples per column, non neg integer, default=2, maybe limit to 20, spinbox
+    filter="showcqt=fullhd=0"
+}
+
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
-while getopts fH:b:c:d:egijkl:m:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
+while getopts fH:b:c:d:egijkl:m:npq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -497,6 +501,8 @@ while getopts fH:b:c:d:egijkl:m:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
         j)  horizoffset ;;
         k)  movietype="amovie"
             showspectrum ;;
+        p)  movietype="amovie"
+            showcqt ;;
         l)  movietype="amovie"
             samples=$(echo $OPTARG | cut -d+ -f1)
             showwaves ${samples:-N};;
