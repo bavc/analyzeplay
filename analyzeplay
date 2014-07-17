@@ -547,6 +547,6 @@ done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
 [ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
-[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="/Users/drice/Desktop/hide/newff/FFmpeg/ffplay \"$inputfile\" $filter"
+[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay \"$inputfile\" $filter"
 echo "Running: $command"
 eval "$command"
