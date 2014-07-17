@@ -596,6 +596,10 @@ done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
 [ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
-[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay -f lavfi \"${movietype}=$inputfile,$filter\""
+if [ ! "$movietype" = "movie" ] ; then
+    [ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay -f lavfi \"${movietype}=$inputfile,$filter\""
+else
+    [ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay \"$inputfile\" -vf '$filter'"
+fi
 echo "Running: $command"
 eval "$command"
