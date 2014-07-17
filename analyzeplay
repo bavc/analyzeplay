@@ -447,6 +447,11 @@ showspectrum(){
     # Name: Field Split
     filter="showspectrum"
 }
+
+# filter recipes
+showwaves(){
+    # Name: Field Split
+    filter="showwaves"
 }
 
 
@@ -490,6 +495,8 @@ while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
         j)  horizoffset ;;
         k)  movietype="amovie"
             showspectrum ;;
+        l)  movietype="amovie"
+            showwaves ;;
         m) 
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             hue=$(echo $OPTARG | cut -d+ -f2)
