@@ -450,14 +450,16 @@ showspectrum(){
 
 # filter recipes
 showwaves(){
-    # Name: Field Split
-    filter="showwaves"
+    # Name: Audio Waveform
+    # arg1: samples per column, non neg integer, default=2, maybe limit to 20, spinbox
+    filter="showwaves=mode=line:n=$1"
 }
 
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
 while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
+while getopts fH:b:c:d:egijkl:m:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -496,7 +498,8 @@ while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
         k)  movietype="amovie"
             showspectrum ;;
         l)  movietype="amovie"
-            showwaves ;;
+            samples=$(echo $OPTARG | cut -d+ -f1)
+            showwaves ${samples:-N};;
         m) 
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             hue=$(echo $OPTARG | cut -d+ -f2)
