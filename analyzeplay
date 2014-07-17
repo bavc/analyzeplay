@@ -93,7 +93,7 @@ waveform(){
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: scale, range=1..255, default=20, slider
     # arg3: parade, boolean, default=N, toggle
-    # arg3: horizontal, boolean, default=N, toggle
+    # arg4: horizontal, boolean, default=N, toggle
     [[ "${2}" -ge 1 && "${2}" -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
     
     if [ "$1" = "N" -a "$3" = "N" -a "$4" = "N" ] ; then
