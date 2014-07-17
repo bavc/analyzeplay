@@ -533,6 +533,8 @@ while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:h opt ; do
         l)  movietype="amovie"
             samples=$(echo $OPTARG | cut -d+ -f1)
             showwaves ${samples:-N};;
+        t)  movietype="amovie"
+            avectorscope ;;
         m) 
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             hue=$(echo $OPTARG | cut -d+ -f2)
