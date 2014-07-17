@@ -52,18 +52,22 @@ framemetadataplay(){
 }
 
 waveletnoise(){
+    # skip
     filter="-vf split[a][b],[a]owdenoise[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
 }
 
 dctnoise(){
+    # skip
     filter="-vf split[a][b],[a]dctdnoiz[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
 }
 
 deshakediff(){
+    # skip
     filter="-vf split[a][b],[a]deshake=edge=2[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
 }
 
 horizoffset(){
+    #skip
     filter="-vf 'split[a][b];[a]crop=iw/2:ih:iw/2:0,setpts=PTS-STARTPTS[a1];[b]crop=iw/2:ih:0:0,setpts=PTS+10/TB[b1];[a1][b1]framepack'"
 }
 
