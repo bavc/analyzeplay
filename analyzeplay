@@ -444,8 +444,8 @@ head(){
 
 # filter recipes
 showspectrum(){
-    # Name: Field Split
-    filter="showspectrum"
+    # Name: Audio Spectrum
+    filter="showspectrum=slide=1:mode=separate:color=intensity"
 }
 
 # filter recipes
