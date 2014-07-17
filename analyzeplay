@@ -36,7 +36,15 @@ fieldsplitplay(){
 
 fielddiffplay(){
     # Name: Field Difference
-    filter="-vf 'split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average'"
+    # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
+    # arg2: strength, range=0..1, default=0.2, slider
+    # arg3: intensity, range=0..1, default=0.2, slider
+    if [ "$1" = "all" ] ; then
+        filter="-vf 'split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3'"
+    else
+        filter="-vf 'extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3'"
+    fi
+}
 }
 
 waveletnoise(){
@@ -430,10 +438,14 @@ showspectrum(){
 
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
-while getopts fH:b:c:degijkm:q:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
+while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
-        d) fielddiffplay ;;
+        d)  plane=$(echo $OPTARG | cut -d+ -f2)
+            plane=$(echo $OPTARG | cut -d+ -f1)
+            strength=$(echo $OPTARG | cut -d+ -f2)
+            intensity=$(echo $OPTARG | cut -d+ -f3)
+            fielddiffplay ${plane:-v} ${strength:-0.2} ${intensity:-0.2} ;;
         H)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             histogram ${fieldsplit:-N}
             ;;
