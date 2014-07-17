@@ -45,6 +45,10 @@ fielddiffplay(){
         filter="-vf 'extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3'"
     fi
 }
+
+framemetadataplay(){
+    # i may add an option to switch between multiple template txt files, but for now just one.
+    filter="-vf 'cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt'"
 }
 
 waveletnoise(){
@@ -480,6 +484,7 @@ while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             sat=$(echo $OPTARG | cut -d+ -f3)
             chromaadjust $fieldsplit $hue $sat
             ;;
+        n) framemetadataplay ;;
         A)
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             scale=$(echo $OPTARG | cut -d+ -f2)

@@ -1,0 +1,18 @@
+time (sec) %{pts}	pts %{pts:hms}	pict_type %{pict_type}
+
+	min	low	avg	high	max	diff
+Y	%{metadata:lavfi.signalstats.YMIN}	%{metadata:lavfi.signalstats.YLOW}	%{metadata:lavfi.signalstats.YAVG}	%{metadata:lavfi.signalstats.YHIGH}	%{metadata:lavfi.signalstats.YMAX}	%{metadata:lavfi.signalstats.YDIF}
+U	%{metadata:lavfi.signalstats.UMIN}	%{metadata:lavfi.signalstats.ULOW}	%{metadata:lavfi.signalstats.UAVG}	%{metadata:lavfi.signalstats.UHIGH}	%{metadata:lavfi.signalstats.UMAX}	%{metadata:lavfi.signalstats.UDIF}
+V	%{metadata:lavfi.signalstats.VMIN}	%{metadata:lavfi.signalstats.VLOW}	%{metadata:lavfi.signalstats.VAVG}	%{metadata:lavfi.signalstats.VHIGH}	%{metadata:lavfi.signalstats.VMAX}	%{metadata:lavfi.signalstats.VDIF}
+SAT	%{metadata:lavfi.signalstats.SATMIN}	%{metadata:lavfi.signalstats.SATLOW}	%{metadata:lavfi.signalstats.SATAVG}	%{metadata:lavfi.signalstats.SATHIGH}	%{metadata:lavfi.signalstats.SATMAX}
+
+HUE (median)	%{metadata:lavfi.signalstats.HUEMED}
+HUE (average)	%{metadata:lavfi.signalstats.HUEAVG}
+TOUT    	%{metadata:lavfi.signalstats.TOUT}
+VREP    	%{metadata:lavfi.signalstats.VREP}
+BRNG    	%{metadata:lavfi.signalstats.BRNG}
+
+cropdetect info
+size    	%{metadata:lavfi.cropdetect.w}x%{metadata:lavfi.cropdetect.h}
+columns    	%{metadata:lavfi.cropdetect.x1}-%{metadata:lavfi.cropdetect.x2}
+rows    	%{metadata:lavfi.cropdetect.y1}-%{metadata:lavfi.cropdetect.y2}
