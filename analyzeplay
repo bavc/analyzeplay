@@ -500,7 +500,7 @@ while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             scale=$(echo $OPTARG | cut -d+ -f2)
             parade=$(echo $OPTARG | cut -d+ -f3)
             horizontal=$(echo $OPTARG | cut -d+ -f4)
-            waveform ${fieldsplit:-N} ${scale:-10} ${parade:-N} ${horizontal:-V}
+            waveform ${fieldsplit:-N} ${scale:-20} ${parade:-N} ${horizontal:-V}
             ;;
         E)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             rang ${fieldsplit:-N}
