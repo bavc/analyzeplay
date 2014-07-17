@@ -31,7 +31,7 @@ usage(){
 # filter recipes
 fieldsplitplay(){
     # Name: Field Split
-    filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab'"
+    filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab'"
 }
 
 fielddiffplay(){
@@ -40,35 +40,35 @@ fielddiffplay(){
     # arg2: strength, range=0..1, default=0.2, slider
     # arg3: intensity, range=0..1, default=0.2, slider
     if [ "$1" = "all" ] ; then
-        filter="-vf 'split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3'"
+        filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3"
     else
-        filter="-vf 'extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3'"
+        filter="extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3"
     fi
 }
 
 framemetadataplay(){
     # i may add an option to switch between multiple template txt files, but for now just one.
-    filter="-vf 'cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt'"
+    filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
 }
 
 waveletnoise(){
     # skip
-    filter="-vf split[a][b],[a]owdenoise[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
+    filter="split[a][b],[a]owdenoise[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
 }
 
 dctnoise(){
     # skip
-    filter="-vf split[a][b],[a]dctdnoiz[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
+    filter="split[a][b],[a]dctdnoiz[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
 }
 
 deshakediff(){
     # skip
-    filter="-vf split[a][b],[a]deshake=edge=2[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
+    filter="split[a][b],[a]deshake=edge=2[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
 }
 
 horizoffset(){
     #skip
-    filter="-vf 'split[a][b];[a]crop=iw/2:ih:iw/2:0,setpts=PTS-STARTPTS[a1];[b]crop=iw/2:ih:0:0,setpts=PTS+10/TB[b1];[a1][b1]framepack'"
+    filter="split[a][b];[a]crop=iw/2:ih:iw/2:0,setpts=PTS-STARTPTS[a1];[b]crop=iw/2:ih:0:0,setpts=PTS+10/TB[b1];[a1][b1]framepack"
 }
 
 histogram(){
@@ -77,13 +77,13 @@ histogram(){
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: rgb, boolean, default=N, toggle
     if [ "$1" = "N" -a "$2" = "N" ] ; then
-        filter="-vf 'histogram'"
+        filter="histogram'"
     elif [ "$1" = "Y" -a "$2" = "N" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack'"
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack"
     elif [ "$1" = "N" -a "$2" = "Y" ] ; then
-        filter="-vf 'format=rgb48,histogram'"
+        filter="format=rgb48,histogram"
     elif [ "$1" = "Y" -a "$2" = "Y" ] ; then
-        filter="-vf 'format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack'"
+        filter="format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack"
     fi
 }
 
@@ -97,18 +97,18 @@ waveform(){
     [[ "${2}" -ge 1 && "${2}" -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
     
     if [ "$1" = "N" -a "$3" = "N" -a "$4" = "N" ] ; then
-        filter="-vf 'histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        filter="histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        scale=iw:512'"
+        setdar=4/3"
     elif [ "$1" = "N" -a "$3" = "Y" -a "$4" = "N" ] ; then
-        filter="-vf 'histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        filter="histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        drawgrid=width=0:height=256:thickness=1:color=white@0.5'"
+        drawgrid=width=0:height=256:thickness=1:color=white@0.5"
     elif [ "$1" = "Y" -a "$3" = "N" -a "$4" = "N" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
@@ -117,9 +117,9 @@ waveform(){
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     elif [ "$1" = "Y" -a "$3" = "Y" -a "$4" = "N" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
@@ -128,20 +128,20 @@ waveform(){
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
-        [a2][b2]framepack'"
+        [a2][b2]framepack"
     elif [ "$1" = "N" -a "$3" = "N" -a "$4" = "Y" ] ; then
-        filter="-vf 'transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        filter="transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        scale=iw:512'"
+        setdar=4/3"
     elif [ "$1" = "N" -a "$3" = "Y" -a "$4" = "Y" ] ; then
-        filter="-vf 'transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        filter="transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        drawgrid=width=0:height=256:thickness=1:color=white@0.5'"
+        drawgrid=width=0:height=256:thickness=1:color=white@0.5"
     elif [ "$1" = "Y" -a "$3" = "N" -a "$4" = "Y" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
@@ -150,9 +150,9 @@ waveform(){
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     elif [ "$1" = "Y" -a "$3" = "Y" -a "$4" = "Y" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
@@ -161,7 +161,7 @@ waveform(){
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
-        [a2][b2]framepack'"
+        [a2][b2]framepack"
     fi
 }
 
@@ -172,7 +172,7 @@ vectorscope(){
     # arg2: scale, range=1..10, default=1, slider
     [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
     if [ "$1" = "N" ] ; then
-        filter="-vf 'histogram=mode=color2,lutyuv=y=val*$2,\
+        filter="histogram=mode=color2,lutyuv=y=val*$2,\
         transpose=dir=2,\
         scale=512:512,\
         drawgrid=w=32:h=32:t=1:c=white@0.1,\
@@ -192,9 +192,9 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
-        drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8'"
+        drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=mode=color2,lutyuv=y=val*$2,\
         transpose=dir=2,\
         scale=512:512,\
@@ -237,21 +237,21 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
 extract_plane_uv(){
     # arg1: fieldsplit, boolean, default=N, toggle
     if [ "$1" = "N" ] ; then
-        filter="-vf 'extractplanes=u+v,framepack'"
+        filter="extractplanes=u+v,framepack'"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]extractplanes=u+v,framepack[a2];\
         [b1]extractplanes=u+v,framepack[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -262,14 +262,14 @@ extract_plane_uv_eq(){
     [[ $2 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
     [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
     if [ "$1" = "N" ] ; then
-        filter="-vf 'extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3'"
+        filter="extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3[a2];\
         [b1]extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -280,14 +280,14 @@ extract_plane(){
     # arg2: plane, select of (y, u, or v), default=v, radio buttons
     [[ $(echo $2 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
     if [ "$1" = "N" ] ; then
-        filter="-vf 'format=yuv444p,extractplanes=$2'"
+        filter="format=yuv444p,extractplanes=$2"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]format=yuv444p,extractplanes=$2[a2];\
         [b1]format=yuv444p,extractplanes=$2[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -302,14 +302,14 @@ extract_plane_eq(){
     [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
     [[ $4 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
     if [ "$1" = "N" ] ; then
-        filter="-vf 'format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4'"
+        filter="format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4[a2];\
         [b1]format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -321,13 +321,14 @@ bitslice(){
     [[ $1 -ge -1 && $1 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
     [[ $2 -ge -1 && $2 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
     [[ $3 -ge -1 && $3 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
-    filter="-vf 'lutyuv=\
+    filter="lutyuv=\
         y=if(eq($1\,-1)\,128\,if(eq($1\,0)\,val\,bitand(val\,pow(2\,8-$1))*pow(2\,$1))):\
         u=if(eq($2\,-1)\,128\,if(eq($2\,0)\,val\,bitand(val\,pow(2\,8-$2))*pow(2\,$2))):\
-        v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3)))'"
+        v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3)))"
 }
 
 valueslice(){
+    # skip
     # description: Highlight a select value for each plane.
     # arg1: y value, range=-0..255, default=128, slider
     # arg2: u value, range=-0..255, default=128, slider
@@ -335,10 +336,10 @@ valueslice(){
     [[ $1 -ge 0 && $1 -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
     [[ $2 -ge 0 && $2 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
     [[ $3 -ge 0 && $3 -le 255 ]] || { echo The v value must be between 0 and 255 ; exit 1 ;};
-    filter="-vf 'lutyuv=\
+    filter="lutyuv=\
         y=if(eq(val\,$1)\,255\,val):\
         u=if(eq(val\,$2)\,255\,val):\
-        v=if(eq(val\,$3)\,255\,val)'"
+        v=if(eq(val\,$3)\,255\,val)"
 }
 
 valuehighlight(){
@@ -352,13 +353,13 @@ valuehighlight(){
     [[ $4 -ge 0 && $3 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
     
     if [ "$1" = "N" ] ; then
-        filter="-vf 'extractplanes=$2,lutrgb=r=if(between(val\,$3\,$4)\,255\,val):g=if(between(val\,$3\,$4)\,255\,val):b=if(between(val\,$3\,$4)\,0\,val)'"
+        filter="extractplanes=$2,lutrgb=r=if(between(val\,$3\,$4)\,255\,val):g=if(between(val\,$3\,$4)\,255\,val):b=if(between(val\,$3\,$4)\,0\,val)"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'extractplanes=$2,split[a][b];[a]field=top[a1];\
+        filter="extractplanes=$2,split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]lutrgb=r=if(between(val\,$3\,$4)\,255\,val):g=if(between(val\,$3\,$4)\,255\,val):b=if(between(val\,$3\,$4)\,0\,val)[a2];\
         [b1]lutrgb=r=if(between(val\,$3\,$4)\,255\,val):g=if(between(val\,$3\,$4)\,255\,val):b=if(between(val\,$3\,$4)\,0\,val)[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -369,13 +370,13 @@ chromaadjust(){
     # arg2: hue, range=0..360, default=0, slider
     # arg3: saturation, range=-10..10, default=1, slider
     if [ "$1" = "N" ] ; then
-        filter="-vf 'hue=h=$2:s=$3'"
+        filter="hue=h=$2:s=$3"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];\
+        filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]hue=h=$2:s=$3[a2];\
         [b1]hue=h=$2:s=$3[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -384,13 +385,13 @@ rang(){
     # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
     # arg1: fieldsplit, boolean, default=N, toggle
     if [ "$1" = "N" ] ; then
-        filter="-vf 'signalstats=out=rang'"
+        filter="signalstats=out=rang"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];[a]field=top[a1];\
+        filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]signalstats=out=rang[a2];\
         [b1]signalstats=out=rang[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -399,14 +400,14 @@ tout(){
     # Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
     # arg1: fieldsplit, boolean, default=N, toggle
     if [ "$1" = "N" ] ; then
-        filter="-vf 'signalstats=out=tout'"
+        filter="signalstats=out=tout"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]signalstats=out=tout[a2];\
         [b1]signalstats=out=tout[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
@@ -414,40 +415,43 @@ vrep(){
     # Name: Veritcal Repetition Pixels
     # arg1: fieldsplit, boolean, default=N, toggle
     if [ "$1" = "N" ] ; then
-        filter="-vf 'signalstats=out=vrep'"
+        filter="signalstats=out=vrep"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]signalstats=out=vrep[a2];\
         [b1]signalstats=out=vrep[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
 head(){
+    # skip
     # Name: Head Switch Pixels
     # arg1: fieldsplit, boolean, default=N, toggle
     if [ "$1" = "N" ] ; then
-        filter="-vf 'signalstats=out=head'"
+        filter="signalstats=out=head"
     elif [ "$1" = "Y" ] ; then
-        filter="-vf 'split[a][b];\
+        filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]signalstats=out=head[a2];\
         [b1]signalstats=out=head[b2];\
-        [a2][b2]framepack=tab'"
+        [a2][b2]framepack=tab"
     fi
 }
 
 # filter recipes
 showspectrum(){
     # Name: Field Split
-    filter="-af 'showspectrum'"
+    filter="showspectrum"
+}
 }
 
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
+movietype="movie"
 while getopts fH:b:c:d:egijkm:nq:A:E:J:L:M:N:P:Q:R:V:o:h opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
@@ -544,6 +548,6 @@ done
 shift $(( ${OPTIND} - 1 ))
 inputfile="$1"
 [ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
-[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay \"$inputfile\" $filter"
+[ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay -f lavfi \"${movietype}=$inputfile,$filter\""
 echo "Running: $command"
 eval "$command"
