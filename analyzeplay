@@ -64,6 +64,14 @@ fielddiffplay(){
     fi
 }
 
+columndiffplay(){
+    # Name: Column Difference
+    # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
+    # arg2: strength, range=0..1, default=0.2, slider
+    # arg3: intensity, range=0..1, default=0.2, slider
+    filter="extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2,scale=iw*2:ih,setdar=1:1"
+}
+
 framemetadataplay(){
     # n
     # i may add an option to switch between multiple template txt files, but for now just one.
@@ -72,14 +80,6 @@ framemetadataplay(){
     height=486
     dar=4/3
     filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
-}
-
-columndiffplay(){
-    # Name: Column Difference
-    # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
-    # arg2: strength, range=0..1, default=0.2, slider
-    # arg3: intensity, range=0..1, default=0.2, slider
-    filter="extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2,scale=iw*2:ih,setdar=1:1"
 }
 
 waveletnoise(){
