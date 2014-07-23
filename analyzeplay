@@ -106,12 +106,16 @@ histogram(){
 }
 
 waveform(){
+    # A
     # Name: Waveform
     # Description: A waveform display. Guide lines are drawn at 7.5 IRE (0x16) and 100 IRE (0xEB). The area above 100 IRE is tinted in crimson and below 7.5 IRE is tinted aqua. These ranges, above 100 IRE and below 7.5 IRE, show luminosity values outside of broadcast range.
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: scale, range=1..255, default=20, slider
     # arg3: parade, boolean, default=N, toggle
     # arg4: horizontal, boolean, default=N, toggle
+    width=720
+    height=486
+    dar=4/3
     [[ "${2}" -ge 1 && "${2}" -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
     
     if [ "$1" = "N" -a "$3" = "N" -a "$4" = "N" ] ; then
@@ -119,12 +123,15 @@ waveform(){
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        setdar=4/3"
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "N" -a "$3" = "Y" -a "$4" = "N" ] ; then
         filter="histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        drawgrid=width=0:height=256:thickness=1:color=white@0.5"
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        drawgrid=width=0:height=256:thickness=1:color=white@0.5,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" -a "$3" = "N" -a "$4" = "N" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
@@ -135,7 +142,9 @@ waveform(){
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
-        [a2][b2]framepack=tab"
+        [a2][b2]framepack=tab.\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" -a "$3" = "Y" -a "$4" = "N" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
@@ -146,18 +155,23 @@ waveform(){
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
-        [a2][b2]framepack"
+        [a2][b2]framepack,\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "N" -a "$3" = "N" -a "$4" = "Y" ] ; then
         filter="transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        setdar=4/3"
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "N" -a "$3" = "Y" -a "$4" = "Y" ] ; then
         filter="transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
-        drawgrid=width=0:height=256:thickness=1:color=white@0.5"
+        drawgrid=width=0:height=256:thickness=1:color=white@0.5,\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" -a "$3" = "N" -a "$4" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
@@ -168,7 +182,9 @@ waveform(){
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
-        [a2][b2]framepack=tab"
+        [a2][b2]framepack=tab,\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" -a "$3" = "Y" -a "$4" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
@@ -179,7 +195,9 @@ waveform(){
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
-        [a2][b2]framepack"
+        [a2][b2]framepack,\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
