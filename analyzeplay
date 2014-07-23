@@ -3,9 +3,9 @@
 
 usage(){
     echo "
-    $(basename $0)
+    $(basename ${0})
 
-    usage: $(basename $0) [ filteroption ] [ -o outputfile ] inputfile
+    usage: $(basename ${0}) [ filteroption ] [ -o outputfile ] inputfile
 
     use - (hyphen) for the input if it is a pipe (for instace: bmdcapture -v -F nut -c 2 -s 16 -p 8 -m 0 -f pipe:1 | analyzeplay -c -)
 
@@ -34,7 +34,7 @@ normal(){
     width=720
     height=486
     dar=4/3
-    filter="scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    filter="scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
 
 }
 
@@ -45,7 +45,7 @@ fieldsplitplay(){
     width=720
     height=486
     dar=4/3
-    filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
 }
 
 fielddiffplay(){
@@ -58,14 +58,14 @@ fielddiffplay(){
     width=720
     height=486
     dar=4/3
-    if [ "$4" = "N" -a "$1" = "all" ] ; then
-        filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$4" = "Y" -a "$1" = "all" ] ; then
-        filter="transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$4" = "N" -a "$1" != "all" ] ; then
-        filter="extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$4" = "Y" -a "$1" != "all" ] ; then
-        filter="extractplanes=$1,transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    if [ "${4}" = "N" -a "${1}" = "all" ] ; then
+        filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${4}" = "Y" -a "${1}" = "all" ] ; then
+        filter="transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${4}" = "N" -a "${1}" != "all" ] ; then
+        filter="extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${4}" = "Y" -a "${1}" != "all" ] ; then
+        filter="extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -76,7 +76,7 @@ framemetadataplay(){
     width=720
     height=486
     dar=4/3
-    filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
+    filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar},drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
 }
 
 histogram(){
@@ -90,18 +90,18 @@ histogram(){
     width=720
     height=486
     dar=4/3
-    if   [ "$1" = "N" -a "$2" = "N" -a "$3" = "all" ] ; then
-        filter="histogram,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$2" = "N" -a "$3" = "all"  ] ; then
-        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "N" -a "$2" = "Y" ] ; then
-        filter="format=rgb48,histogram,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$2" = "Y"  ] ; then
-        filter="format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "N" -a "$2" = "N" -a "$3" != "all" ] ; then
-        filter="extractplanes=$3,histogram,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$2" = "N" -a "$3" != "all"  ] ; then
-        filter="extractplanes=$3,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    if   [ "${1}" = "N" -a "${2}" = "N" -a "${3}" = "all" ] ; then
+        filter="histogram,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${2}" = "N" -a "${3}" = "all"  ] ; then
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "N" -a "${2}" = "Y" ] ; then
+        filter="format=rgb48,histogram,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${2}" = "Y"  ] ; then
+        filter="format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "N" -a "${2}" = "N" -a "${3}" != "all" ] ; then
+        filter="extractplanes=${3},histogram,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${2}" = "N" -a "${3}" != "all"  ] ; then
+        filter="extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -118,86 +118,86 @@ waveform(){
     dar=4/3
     [[ "${2}" -ge 1 && "${2}" -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
     
-    if [ "$1" = "N" -a "$3" != "all" -a "$4" = "N" ] ; then
-        filter="extractplanes=$3,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+    if [ "${1}" = "N" -a "${3}" != "all" -a "${4}" = "N" ] ; then
+        filter="extractplanes=${3},histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "N" -a "$3" = "all" -a "$4" = "N" ] ; then
-        filter="histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "N" -a "${3}" = "all" -a "${4}" = "N" ] ; then
+        filter="histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$3" != "all" -a "$4" = "N" ] ; then
-        filter="extractplanes=$3,split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
-        [a1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${3}" != "all" -a "${4}" = "N" ] ; then
+        filter="extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        [a1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[a2];\
-        [b1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [b1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
         [a2][b2]framepack=tab,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$3" = "all" -a "$4" = "N" ] ; then
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${3}" = "all" -a "${4}" = "N" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
-        [a1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [a1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[a2];\
-        [b1]histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [b1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
         [a2][b2]framepack,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "N" -a "$3" != "all" -a "$4" = "Y" ] ; then
-        filter="extractplanes=$3,transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "N" -a "${3}" != "all" -a "${4}" = "Y" ] ; then
+        filter="extractplanes=${3},transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "N" -a "$3" = "all" -a "$4" = "Y" ] ; then
-        filter="transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "N" -a "${3}" = "all" -a "${4}" = "Y" ] ; then
+        filter="transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$3" != "all" -a "$4" = "Y" ] ; then
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${3}" != "all" -a "${4}" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
-        [a1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [a1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[a2];\
-        [b1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [b1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
         [a2][b2]framepack=tab,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" -a "$3" = "all" -a "$4" = "Y" ] ; then
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" -a "${3}" = "all" -a "${4}" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
-        [a1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [a1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[a2];\
-        [b1]transpose=1,histogram=step=$2:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        [b1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
         [a2][b2]framepack,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -210,9 +210,9 @@ vectorscope(){
     width=720
     height=486
     dar=4/3
-    [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
-    if [ "$1" = "N" ] ; then
-        filter="histogram=mode=color2,lutyuv=y=val*$2,\
+    [[ ${1} -ge -1 && ${1} -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
+    if [ "${1}" = "N" ] ; then
+        filter="histogram=mode=color2,lutyuv=y=val*${2},\
         transpose=dir=2,\
         scale=512:512,\
         drawgrid=w=32:h=32:t=1:c=white@0.1,\
@@ -233,10 +233,10 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,\
-        pad=ih*$dar:ih:(ow-iw)/2:(oh-ih)/2,scale=$width:$height:interl=-1:flags=neighbor,format=rgb24,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+        pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height}:interl=-1:flags=neighbor,format=rgb24,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
-        [a1]histogram=mode=color2,lutyuv=y=val*$2,\
+        [a1]histogram=mode=color2,lutyuv=y=val*${2},\
         transpose=dir=2,\
         scale=512:512,\
         drawgrid=w=32:h=32:t=1:c=white@0.1,\
@@ -257,7 +257,7 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[a2];\
-        [b1]histogram=mode=color2,lutyuv=y=val*$2,\
+        [b1]histogram=mode=color2,lutyuv=y=val*${2},\
         transpose=dir=2,\
         scale=512:512,\
         drawgrid=w=32:h=32:t=1:c=white@0.1,\
@@ -279,7 +279,7 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];\
         [a2][b2]framepack=tab,\
-        pad=ih*$dar:ih:(ow-iw)/2:(oh-ih)/2,scale=$width:$height:interl=-1:flags=neighbor,format=rgb24,setdar=$dar"
+        pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height}:interl=-1:flags=neighbor,format=rgb24,setdar=${dar}"
     fi
 }
 
@@ -291,19 +291,19 @@ extract_plane_uv_eq(){
     width=720
     height=486
     dar=4/3
-    [[ $2 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
-    [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
-    if [ "$1" = "N" ] ; then
-        filter="extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+    [[ ${2} =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
+    [[ ${3} =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
+    if [ "${1}" = "N" ] ; then
+        filter="extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3},\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3[a2];\
-        [b1]extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3[b2];\
+        [a1]extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}[a2];\
+        [b1]extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -318,20 +318,20 @@ extract_plane_eq(){
     width=720
     height=486
     dar=4/3
-    [[ $(echo $2 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
-    [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
-    [[ $4 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
-    if [ "$1" = "N" ] ; then
-        filter="format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+    [[ $(echo ${2} | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
+    [[ ${3} =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
+    [[ ${4} =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
+    if [ "${1}" = "N" ] ; then
+        filter="format=yuv444p,extractplanes=${2},histeq=strength=${3}:intensity=${4},\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4[a2];\
-        [b1]format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4[b2];\
+        [a1]format=yuv444p,extractplanes=${2},histeq=strength=${3}:intensity=${4}[a2];\
+        [b1]format=yuv444p,extractplanes=${2},histeq=strength=${3}:intensity=${4}[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -345,14 +345,14 @@ bitplane(){
     width=720
     height=486
     dar=4/3
-    [[ $1 -ge -1 && $1 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
-    [[ $2 -ge -1 && $2 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
-    [[ $3 -ge -1 && $3 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
+    [[ ${1} -ge -1 && ${1} -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
+    [[ ${2} -ge -1 && ${2} -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
+    [[ ${3} -ge -1 && ${3} -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
     filter="lutyuv=\
-        y=if(eq($1\,-1)\,128\,if(eq($1\,0)\,val\,bitand(val\,pow(2\,8-$1))*pow(2\,$1))):\
-        u=if(eq($2\,-1)\,128\,if(eq($2\,0)\,val\,bitand(val\,pow(2\,8-$2))*pow(2\,$2))):\
-        v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3))),\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        y=if(eq(${1}\,-1)\,128\,if(eq(${1}\,0)\,val\,bitand(val\,pow(2\,8-${1}))*pow(2\,${1}))):\
+        u=if(eq(${2}\,-1)\,128\,if(eq(${2}\,0)\,val\,bitand(val\,pow(2\,8-${2}))*pow(2\,${2}))):\
+        v=if(eq(${3}\,-1)\,128\,if(eq(${3}\,0)\,val\,bitand(val\,pow(2\,8-${3}))*pow(2\,${3}))),\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
 }
 
 valuehighlight(){
@@ -363,9 +363,9 @@ valuehighlight(){
     # arg2: plane, select of (y, u, or v), default=v, radio buttons
     # arg3: min, range=-0..255, default=128, slider
     # arg4: max, range=-min..255, default=128, slider
-    [[ $(echo $2 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
-    [[ $3 -ge 0 && $2 -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
-    [[ $4 -ge 0 && $3 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
+    [[ $(echo ${2} | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
+    [[ ${3} -ge 0 && ${2} -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
+    [[ ${4} -ge 0 && ${3} -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
     width=720
     height=486
     dar=4/3
@@ -373,16 +373,16 @@ valuehighlight(){
     R=255
     G=255
     B=0
-    if [ "$1" = "N" ] ; then
-        filter="extractplanes=$2,lutrgb=r=if(between(val\,$3\,$4)\,$R\,val):g=if(between(val\,$3\,$4)\,$G\,val):b=if(between(val\,$3\,$4)\,$B\,val),\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
-        filter="extractplanes=$2,split[a][b];[a]field=top[a1];\
+    if [ "${1}" = "N" ] ; then
+        filter="extractplanes=${2},lutrgb=r=if(between(val\,${3}\,${4})\,${R}\,val):g=if(between(val\,${3}\,${4})\,${G}\,val):b=if(between(val\,${3}\,${4})\,${B}\,val),\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
+        filter="extractplanes=${2},split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]lutrgb=r=if(between(val\,$3\,$4)\,$R\,val):g=if(between(val\,$3\,$4)\,$G\,val):b=if(between(val\,$3\,$4)\,$B\,val)[a2];\
-        [b1]lutrgb=r=if(between(val\,$3\,$4)\,$R\,val):g=if(between(val\,$3\,$4)\,$G\,val):b=if(between(val\,$3\,$4)\,$B\,val)[b2];\
+        [a1]lutrgb=r=if(between(val\,${3}\,${4})\,${R}\,val):g=if(between(val\,${3}\,${4})\,${G}\,val):b=if(between(val\,${3}\,${4})\,${B}\,val)[a2];\
+        [b1]lutrgb=r=if(between(val\,${3}\,${4})\,${R}\,val):g=if(between(val\,${3}\,${4})\,${G}\,val):b=if(between(val\,${3}\,${4})\,${B}\,val)[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -396,16 +396,16 @@ chromaadjust(){
     width=720
     height=486
     dar=4/3
-    if [ "$1" = "N" ] ; then
-        filter="hue=h=$2:s=$3,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+    if [ "${1}" = "N" ] ; then
+        filter="hue=h=${2}:s=${3},\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]hue=h=$2:s=$3[a2];\
-        [b1]hue=h=$2:s=$3[b2];\
+        [a1]hue=h=${2}:s=${3}[a2];\
+        [b1]hue=h=${2}:s=${3}[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -419,17 +419,17 @@ brng(){
     height=486
     dar=4/3
     # RGBHEX is used for color highlight, default to yellow 0xFFFF00
-    RGBHEX=$2
-    if [ "$1" = "N" ] ; then
-        filter="signalstats=out=brng:c=$RGBHEX,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+    RGBHEX=${2}
+    if [ "${1}" = "N" ] ; then
+        filter="signalstats=out=brng:c=${RGBHEX},\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=brng:c=$RGBHEX[a2];\
-        [b1]signalstats=out=brng:c=$RGBHEX[b2];\
+        [a1]signalstats=out=brng:c=${RGBHEX}[a2];\
+        [b1]signalstats=out=brng:c=${RGBHEX}[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -443,18 +443,18 @@ tout(){
     height=486
     dar=4/3
     # RGBHEX is used for color highlight, default to yellow 0xFFFF00
-    RGBHEX=$2
-    if [ "$1" = "N" ] ; then
-        filter="signalstats=out=tout:c=$RGBHEX,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+    RGBHEX=${2}
+    if [ "${1}" = "N" ] ; then
+        filter="signalstats=out=tout:c=${RGBHEX},\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=tout:c=$RGBHEX[a2];\
-        [b1]signalstats=out=tout:c=$RGBHEX[b2];\
+        [a1]signalstats=out=tout:c=${RGBHEX}[a2];\
+        [b1]signalstats=out=tout:c=${RGBHEX}[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -467,18 +467,18 @@ vrep(){
     height=486
     dar=4/3
     # RGBHEX is used for color highlight, default to yellow 0xFFFF00
-    RGBHEX=$2
-    if [ "$1" = "N" ] ; then
-        filter="signalstats=out=vrep:c=$RGBHEX,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-    elif [ "$1" = "Y" ] ; then
+    RGBHEX=${2}
+    if [ "${1}" = "N" ] ; then
+        filter="signalstats=out=vrep:c=${RGBHEX},\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    elif [ "${1}" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=vrep:c=$RGBHEX[a2];\
-        [b1]signalstats=out=vrep:c=$RGBHEX[b2];\
+        [a1]signalstats=out=vrep:c=${RGBHEX}[a2];\
+        [b1]signalstats=out=vrep:c=${RGBHEX}[b2];\
         [a2][b2]framepack=tab,\
-        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     fi
 }
 
@@ -492,7 +492,7 @@ showspectrum(){
 showwaves(){
     # Name: Audio Waveform
     # arg1: samples per column, non neg integer, default=2, maybe limit to 20, spinbox
-    filter="showwaves=mode=line:n=$1"
+    filter="showwaves=mode=line:n=${1}"
 }
 
 showcqt(){
@@ -506,102 +506,102 @@ avectorscope(){
 }
 
 
-[ "$#" = 0 ] && { usage ; exit 1 ;};
+[ "${#}" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
 while getopts fH:b:d:kl:m:npq:s:tA:E:J:M:N:R:V:o:hZ opt ; do
-    case "$opt" in
+    case "${opt}" in
         f) fieldsplitplay ;;
-        d)  plane=$(echo $OPTARG | cut -d+ -f2)
-            plane=$(echo $OPTARG | cut -d+ -f1)
-            strength=$(echo $OPTARG | cut -d+ -f2)
-            intensity=$(echo $OPTARG | cut -d+ -f3)
-            column=$(echo $OPTARG | cut -d+ -f4)
+        d)  plane=$(echo ${OPTARG} | cut -d+ -f2)
+            plane=$(echo ${OPTARG} | cut -d+ -f1)
+            strength=$(echo ${OPTARG} | cut -d+ -f2)
+            intensity=$(echo ${OPTARG} | cut -d+ -f3)
+            column=$(echo ${OPTARG} | cut -d+ -f4)
             fielddiffplay ${plane:-v} ${strength:-0.2} ${intensity:-0.2} ${column:-N} ;;
-        H)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            rgb=$(echo $OPTARG | cut -d+ -f2)
-            plane=$(echo $OPTARG | cut -d+ -f3)
+        H)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            rgb=$(echo ${OPTARG} | cut -d+ -f2)
+            plane=$(echo ${OPTARG} | cut -d+ -f3)
             histogram ${fieldsplit:-N} ${rgb:-N} ${plane:-all}
             ;;
         b)
-            [[ $(echo $OPTARG | grep "\-\?[0-8]+-\?[0-8]+-\?[0-8]") ]] || { echo The bits slice expression must be expression in y+u+v format, such as -b 1+2+3 to show the first bit only of the y plane, second bit of the u plane, and third bit of the v plane. Any value may be set to zero to disable bits or set to -1 to pass all bits. ; exit 1 ;};
-            bity=$(echo $OPTARG | cut -d+ -f1)
-            bitu=$(echo $OPTARG | cut -d+ -f2)
-            bitv=$(echo $OPTARG | cut -d+ -f3)
-            bitplane $bity $bitu $bitv
+            [[ $(echo ${OPTARG} | grep "\-\?[0-8]+-\?[0-8]+-\?[0-8]") ]] || { echo The bits slice expression must be expression in y+u+v format, such as -b 1+2+3 to show the first bit only of the y plane, second bit of the u plane, and third bit of the v plane. Any value may be set to zero to disable bits or set to -1 to pass all bits. ; exit 1 ;};
+            bity=$(echo ${OPTARG} | cut -d+ -f1)
+            bitu=$(echo ${OPTARG} | cut -d+ -f2)
+            bitv=$(echo ${OPTARG} | cut -d+ -f3)
+            bitplane ${bity} ${bitu} ${bitv}
             ;;
         q)
-            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            plane=$(echo $OPTARG | cut -d+ -f2)
-            valmin=$(echo $OPTARG | cut -d+ -f3)
-            valmax=$(echo $OPTARG | cut -d+ -f4)
-            valuehighlight $fieldsplit $plane $valmin $valmax
+            fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            plane=$(echo ${OPTARG} | cut -d+ -f2)
+            valmin=$(echo ${OPTARG} | cut -d+ -f3)
+            valmax=$(echo ${OPTARG} | cut -d+ -f4)
+            valuehighlight ${fieldsplit} ${plane} ${valmin} ${valmax}
             ;;
         k)  movietype="amovie"
             showspectrum ;;
         p)  movietype="amovie"
             showcqt ;;
         l)  movietype="amovie"
-            samples=$(echo $OPTARG | cut -d+ -f1)
+            samples=$(echo ${OPTARG} | cut -d+ -f1)
             showwaves ${samples:-N};;
         t)  movietype="amovie"
             avectorscope ;;
         m) 
-            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            hue=$(echo $OPTARG | cut -d+ -f2)
-            sat=$(echo $OPTARG | cut -d+ -f3)
-            chromaadjust $fieldsplit $hue $sat
+            fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            hue=$(echo ${OPTARG} | cut -d+ -f2)
+            sat=$(echo ${OPTARG} | cut -d+ -f3)
+            chromaadjust ${fieldsplit} ${hue} ${sat}
             ;;
         n) framemetadataplay ;;
         A)
-            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            scale=$(echo $OPTARG | cut -d+ -f2)
-            plane=$(echo $OPTARG | cut -d+ -f3)
-            horizontal=$(echo $OPTARG | cut -d+ -f4)
+            fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            scale=$(echo ${OPTARG} | cut -d+ -f2)
+            plane=$(echo ${OPTARG} | cut -d+ -f3)
+            horizontal=$(echo ${OPTARG} | cut -d+ -f4)
             waveform ${fieldsplit:-N} ${scale:-20} ${plane:-y} ${horizontal:-V}
             ;;
-        E)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+        E)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            highlightcolor=$(echo ${OPTARG} | cut -d+ -f2)
             brng ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         J)
-            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            scale=$(echo $OPTARG | cut -d+ -f2)
+            fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            scale=$(echo ${OPTARG} | cut -d+ -f2)
             vectorscope ${fieldsplit:-N} ${scale:-10}
             ;;
-        M)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+        M)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            highlightcolor=$(echo ${OPTARG} | cut -d+ -f2)
             vrep ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
-        N)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            highlightcolor=$(echo $OPTARG | cut -d+ -f2)
+        N)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            highlightcolor=$(echo ${OPTARG} | cut -d+ -f2)
             tout ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         R) 
-            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            strength=$(echo $OPTARG | cut -d+ -f2)
-            intensity=$(echo $OPTARG | cut -d+ -f3)
+            fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            strength=$(echo ${OPTARG} | cut -d+ -f2)
+            intensity=$(echo ${OPTARG} | cut -d+ -f3)
             extract_plane_uv_eq ${fieldsplit:-N} ${strength:-0.2} ${intensity:-0.2}
             ;;
         V) 
-            fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            plane=$(echo $OPTARG | cut -d+ -f2)
-            strength=$(echo $OPTARG | cut -d+ -f3)
-            intensity=$(echo $OPTARG | cut -d+ -f4)
+            fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
+            plane=$(echo ${OPTARG} | cut -d+ -f2)
+            strength=$(echo ${OPTARG} | cut -d+ -f3)
+            intensity=$(echo ${OPTARG} | cut -d+ -f4)
             extract_plane_eq ${fieldsplit:-N} ${plane:-v} ${strength:-0.2} ${intensity:-0.2}
             ;;
-        o) outputfile="$OPTARG" ;;
+        o) outputfile="${OPTARG}" ;;
         h) usage ; exit 1 ;;
         Z) normal;;
         \?) usage ; exit 1 ;;
     esac
 done
 shift $(( ${OPTIND} - 1 ))
-inputfile="$1"
-[ ! -f "$inputfile" ] && [ ! "$inputfile" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
-if [ ! "$movietype" = "movie" ] ; then
-    [ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay -f lavfi \"${movietype}=$inputfile,$filter\""
+inputfile="${1}"
+[ ! -f "${inputfile}" ] && [ ! "${inputfile}" = "-" ] && { echo No input file detected. ; usage ; exit 1 ;};
+if [ ! "${movietype}" = "movie" ] ; then
+    [ -n "${outputfile}" ] && command="ffmpeg -i \"${inputfile}\" ${filter} \"${outputfile}\"" || command="ffplay -f lavfi \"${movietype}=${inputfile},${filter}\""
 else
-    [ -n "$outputfile" ] && command="ffmpeg -i \"$inputfile\" $filter \"$outputfile\"" || command="ffplay \"$inputfile\" -vf '$filter'"
+    [ -n "${outputfile}" ] && command="ffmpeg -i \"${inputfile}\" ${filter} \"${outputfile}\"" || command="ffplay \"${inputfile}\" -vf '${filter}'"
 fi
-echo "Running: $command"
-eval "$command"
+echo "Running: ${command}"
+eval "${command}"
