@@ -58,20 +58,15 @@ fielddiffplay(){
     width=720
     height=486
     dar=4/3
-    if [ "$1" = "all" ] ; then
-        if [ "$4" = "N" ] ; then
-            filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-        else
-            filter="transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-        fi
-    else
-        if [ "$4" = "N" ] ; then
-            filter="extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-        else
-            filter="extractplanes=$1,transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
-        fi
+    if [ "$4" = "N" -a "$1" = "all" ] ; then
+        filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$4" = "Y" -a "$1" = "all" ] ; then
+        filter="transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$4" = "N" -a "$1" != "all" ] ; then
+        filter="extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$4" = "Y" -a "$1" != "all" ] ; then
+        filter="extractplanes=$1,transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
-    
 }
 
 framemetadataplay(){
