@@ -66,7 +66,10 @@ framemetadataplay(){
 
 rowdiffplay(){
     # Name: Row Difference
-    filter="-vf 'extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}'"
+    # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
+    # arg2: strength, range=0..1, default=0.2, slider
+    # arg3: intensity, range=0..1, default=0.2, slider
+    filter="extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}"
 }
 
 columndiffplay(){
