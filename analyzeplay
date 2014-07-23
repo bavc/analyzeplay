@@ -335,8 +335,9 @@ extract_plane_eq(){
     fi
 }
 
-bitslice(){
+bitplane(){
     # b
+    # Name: Bit Plane
     # description: Set the bit position for each plane for display for presentation. Setting -1 means to only send 0x80 for that plane, whereas setting 0 means to send the original plane.
     # arg1: y bit position, range=-1..8, default=1, slider
     # arg2: u bit position, range=-1..8, default=0, slider
@@ -518,7 +519,7 @@ while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:R:V:o:hZ opt ; do
             bity=$(echo $OPTARG | cut -d+ -f1)
             bitu=$(echo $OPTARG | cut -d+ -f2)
             bitv=$(echo $OPTARG | cut -d+ -f3)
-            bitslice $bity $bitu $bitv
+            bitplane $bity $bitu $bitv
             ;;
         c)
             valy=$(echo $OPTARG | cut -d+ -f1)
