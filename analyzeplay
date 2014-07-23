@@ -39,14 +39,18 @@ fieldsplitplay(){
 }
 
 fielddiffplay(){
+    # d
     # Name: Field Difference
     # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
     # arg2: strength, range=0..1, default=0.2, slider
     # arg3: intensity, range=0..1, default=0.2, slider
+    width=720
+    height=486
+    dar=4/3
     if [ "$1" = "all" ] ; then
-        filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3"
+        filter="split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     else
-        filter="extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3"
+        filter="extractplanes=$1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=$2:intensity=$3,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
