@@ -485,7 +485,7 @@ avectorscope(){
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:egijkl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
+while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -518,10 +518,6 @@ while getopts fH:b:c:d:egijkl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
             valmax=$(echo $OPTARG | cut -d+ -f4)
             valuehighlight $fieldsplit $plane $valmin $valmax
             ;;
-        e)  waveletnoise ;;
-        g)  dctnoise ;;
-        i)  deshakediff ;;
-        j)  horizoffset ;;
         k)  movietype="amovie"
             showspectrum ;;
         p)  movietype="amovie"
