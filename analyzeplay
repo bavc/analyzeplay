@@ -410,51 +410,75 @@ chromaadjust(){
 }
 
 rang(){
+    # E
     # Name: Broadcast Range Pixels
     # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
+    width=720
+    height=486
+    dar=4/3
+    # RGBHEX is used for color highlight, default to yellow 0xFFFF00
+    RGBHEX=$2
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=rang:c=$2"
+        filter="signalstats=out=rang:c=$RGBHEX,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=rang:c=$2[a2];\
-        [b1]signalstats=out=rang:c=$2[b2];\
-        [a2][b2]framepack=tab"
+        [a1]signalstats=out=rang:c=$RGBHEX[a2];\
+        [b1]signalstats=out=rang:c=$RGBHEX[b2];\
+        [a2][b2]framepack=tab,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
 tout(){
+    # N
     # Name: Temporal Outlier Pixels
     # Description: All pixels labeled as 'temporal outliers' will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are temporal outliers
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
+    width=720
+    height=486
+    dar=4/3
+    # RGBHEX is used for color highlight, default to yellow 0xFFFF00
+    RGBHEX=$2
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=tout:c=$2"
+        filter="signalstats=out=tout:c=$RGBHEX,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=tout:c=$2[a2];\
-        [b1]signalstats=out=tout:c=$2[b2];\
-        [a2][b2]framepack=tab"
+        [a1]signalstats=out=tout:c=$RGBHEX[a2];\
+        [b1]signalstats=out=tout:c=$RGBHEX[b2];\
+        [a2][b2]framepack=tab,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
 vrep(){
+    # M
     # Name: Veritcal Repetition Pixels
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: highlight color, color picker, default=FFFF00 (yellow), toggle
+    width=720
+    height=486
+    dar=4/3
+    # RGBHEX is used for color highlight, default to yellow 0xFFFF00
+    RGBHEX=$2
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=vrep:c=$2"
+        filter="signalstats=out=vrep:c=$RGBHEX,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=vrep:c=$2[a2];\
-        [b1]signalstats=out=vrep:c=$2[b2];\
-        [a2][b2]framepack=tab"
+        [a1]signalstats=out=vrep:c=$RGBHEX[a2];\
+        [b1]signalstats=out=vrep:c=$RGBHEX[b2];\
+        [a2][b2]framepack=tab,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
