@@ -336,17 +336,22 @@ extract_plane_eq(){
 }
 
 bitslice(){
+    # b
     # description: Set the bit position for each plane for display for presentation. Setting -1 means to only send 0x80 for that plane, whereas setting 0 means to send the original plane.
     # arg1: y bit position, range=-1..8, default=1, slider
     # arg2: u bit position, range=-1..8, default=0, slider
     # arg3: v bit position, range=-1..8, default=0, slider
+    width=720
+    height=486
+    dar=4/3
     [[ $1 -ge -1 && $1 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
     [[ $2 -ge -1 && $2 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
     [[ $3 -ge -1 && $3 -le 8 ]] || { echo The bit value must be between -1 and 8 ; exit 1 ;};
     filter="lutyuv=\
         y=if(eq($1\,-1)\,128\,if(eq($1\,0)\,val\,bitand(val\,pow(2\,8-$1))*pow(2\,$1))):\
         u=if(eq($2\,-1)\,128\,if(eq($2\,0)\,val\,bitand(val\,pow(2\,8-$2))*pow(2\,$2))):\
-        v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3)))"
+        v=if(eq($3\,-1)\,128\,if(eq($3\,0)\,val\,bitand(val\,pow(2\,8-$3))*pow(2\,$3))),\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
 }
 
 valueslice(){
