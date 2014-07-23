@@ -74,14 +74,6 @@ framemetadataplay(){
     filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
 }
 
-rowdiffplay(){
-    # Name: Row Difference
-    # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
-    # arg2: strength, range=0..1, default=0.2, slider
-    # arg3: intensity, range=0..1, default=0.2, slider
-    filter="extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}"
-}
-
 columndiffplay(){
     # Name: Column Difference
     # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
@@ -511,7 +503,7 @@ avectorscope(){
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
+while getopts fH:b:c:d:egijkl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -519,10 +511,6 @@ while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
             strength=$(echo $OPTARG | cut -d+ -f2)
             intensity=$(echo $OPTARG | cut -d+ -f3)
             fielddiffplay ${plane:-v} ${strength:-0.2} ${intensity:-0.2} ;;
-        r)  plane=$(echo $OPTARG | cut -d+ -f1)
-            strength=$(echo $OPTARG | cut -d+ -f2)
-            intensity=$(echo $OPTARG | cut -d+ -f3)
-            rowdiffplay ${plane:-v} ${strength:-0.2} ${intensity:-0.2} ;;
         s)  plane=$(echo $OPTARG | cut -d+ -f1)
             strength=$(echo $OPTARG | cut -d+ -f2)
             intensity=$(echo $OPTARG | cut -d+ -f3)
