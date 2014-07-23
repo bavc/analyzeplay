@@ -55,8 +55,13 @@ fielddiffplay(){
 }
 
 framemetadataplay(){
+    # n
     # i may add an option to switch between multiple template txt files, but for now just one.
-    filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
+    # Name: Metadata Overlay
+    width=720
+    height=486
+    dar=4/3
+    filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
 }
 
 rowdiffplay(){
