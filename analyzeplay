@@ -355,21 +355,6 @@ bitplane(){
         scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
 }
 
-valueslice(){
-    # skip
-    # description: Highlight a select value for each plane.
-    # arg1: y value, range=-0..255, default=128, slider
-    # arg2: u value, range=-0..255, default=128, slider
-    # arg3: v value, range=-0..255, default=128, slider
-    [[ $1 -ge 0 && $1 -le 255 ]] || { echo The y value must be between 0 and 255 ; exit 1 ;};
-    [[ $2 -ge 0 && $2 -le 255 ]] || { echo The u value must be between 0 and 255 ; exit 1 ;};
-    [[ $3 -ge 0 && $3 -le 255 ]] || { echo The v value must be between 0 and 255 ; exit 1 ;};
-    filter="lutyuv=\
-        y=if(eq(val\,$1)\,255\,val):\
-        u=if(eq(val\,$2)\,255\,val):\
-        v=if(eq(val\,$3)\,255\,val)"
-}
-
 valuehighlight(){
     # name: Value Highlight
     # description: This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow. For instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.
@@ -500,7 +485,7 @@ avectorscope(){
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:R:V:o:hZ opt ; do
+while getopts fH:b:d:kl:m:npq:s:tA:E:J:L:M:N:R:V:o:hZ opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -520,12 +505,6 @@ while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:R:V:o:hZ opt ; do
             bitu=$(echo $OPTARG | cut -d+ -f2)
             bitv=$(echo $OPTARG | cut -d+ -f3)
             bitplane $bity $bitu $bitv
-            ;;
-        c)
-            valy=$(echo $OPTARG | cut -d+ -f1)
-            valu=$(echo $OPTARG | cut -d+ -f2)
-            valv=$(echo $OPTARG | cut -d+ -f3)
-            valueslice $valy $valu $valv
             ;;
         q)
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
