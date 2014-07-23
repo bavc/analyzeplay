@@ -283,75 +283,55 @@ vectorscope(){
     fi
 }
 
-extract_plane_uv(){
-    # arg1: fieldsplit, boolean, default=N, toggle
-    if [ "$1" = "N" ] ; then
-        filter="extractplanes=u+v,framepack'"
-    elif [ "$1" = "Y" ] ; then
-        filter="split[a][b];\
-        [a]field=top[a1];\
-        [b]field=bottom[b1];\
-        [a1]extractplanes=u+v,framepack[a2];\
-        [b1]extractplanes=u+v,framepack[b2];\
-        [a2][b2]framepack=tab"
-    fi
-}
-
 extract_plane_uv_eq(){
+    # R
     # arg1: fieldsplit, boolean, default=N, toggle
-    # arg2: strength, range=0..1, default=0.2, slider
-    # arg3: intensity, range=0..1, default=0.2, slider
+    # arg2: strength, range=0..1, default=0.0, slider
+    # arg3: intensity, range=0..1, default=0.0, slider
+    width=720
+    height=486
+    dar=4/3
     [[ $2 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
     [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
     if [ "$1" = "N" ] ; then
-        filter="extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3"
+        filter="extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3[a2];\
         [b1]extractplanes=u+v,framepack,histeq=strength=$2:intensity=$3[b2];\
-        [a2][b2]framepack=tab"
-    fi
-}
-
-extract_plane(){
-    # Name: Extract Plane
-    # Description: This filter extracts a video plane which represents the luma or part of the chroma data from the video.
-    # arg1: fieldsplit, boolean, default=N, toggle
-    # arg2: plane, select of (y, u, or v), default=v, radio buttons
-    [[ $(echo $2 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
-    if [ "$1" = "N" ] ; then
-        filter="format=yuv444p,extractplanes=$2"
-    elif [ "$1" = "Y" ] ; then
-        filter="split[a][b];\
-        [a]field=top[a1];\
-        [b]field=bottom[b1];\
-        [a1]format=yuv444p,extractplanes=$2[a2];\
-        [b1]format=yuv444p,extractplanes=$2[b2];\
-        [a2][b2]framepack=tab"
+        [a2][b2]framepack=tab,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
 extract_plane_eq(){
+    # V
     # Name: Extract Plane - Equalized
     # Description: This filter extracts a video plane which represents the luma or part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: plane, select of (y, u, or v), default=v, radio buttons
-    # arg3: strength, range=0..1, default=0.2, slider
-    # arg4: intensity, range=0..1, default=0.2, slider
+    # arg3: strength, range=0..1, default=0.0, slider
+    # arg4: intensity, range=0..1, default=0.0, slider
+    width=720
+    height=486
+    dar=4/3
     [[ $(echo $2 | grep "[yuv]") ]] || { echo The plane value must be set to y, u, or v ; exit 1 ;};
     [[ $3 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The strength value must be between 0 and 1 ; exit 1 ;};
     [[ $4 =~ ^[0-1]+(\.[0-9]+)?$ ]] || { echo The intensity value must be between 0 and 1 ; exit 1 ;};
     if [ "$1" = "N" ] ; then
-        filter="format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4"
+        filter="format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];\
         [a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4[a2];\
         [b1]format=yuv444p,extractplanes=$2,histeq=strength=$3:intensity=$4[b2];\
-        [a2][b2]framepack=tab"
+        [a2][b2]framepack=tab,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
@@ -514,7 +494,7 @@ avectorscope(){
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
+while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:R:V:o:hZ opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -591,13 +571,6 @@ while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
         N)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             highlightcolor=$(echo $OPTARG | cut -d+ -f2)
             tout ${fieldsplit:-N} ${highlightcolor:-FFFF00}
-            ;;
-        P)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            plane=$(echo $OPTARG | cut -d+ -f2)
-            extract_plane ${fieldsplit:-N} ${plane:-v}
-            ;;
-        Q)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
-            extract_plane_uv ${fieldsplit:-N}
             ;;
         R) 
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
