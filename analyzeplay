@@ -84,26 +84,6 @@ framemetadataplay(){
     filter="cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt"
 }
 
-waveletnoise(){
-    # skip
-    filter="split[a][b],[a]owdenoise[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
-}
-
-dctnoise(){
-    # skip
-    filter="split[a][b],[a]dctdnoiz[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
-}
-
-deshakediff(){
-    # skip
-    filter="split[a][b],[a]deshake=edge=2[a1],[b]negate[b1],[a1][b1]blend=all_mode=average,histeq"
-}
-
-horizoffset(){
-    #skip
-    filter="split[a][b];[a]crop=iw/2:ih:iw/2:0,setpts=PTS-STARTPTS[a1];[b]crop=iw/2:ih:0:0,setpts=PTS+10/TB[b1];[a1][b1]framepack"
-}
-
 histogram(){
     # Name: Histogram
     # Description: A histogram display for each channel of the input video (typically either in YUV or RBG).
