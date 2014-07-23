@@ -409,7 +409,7 @@ chromaadjust(){
     fi
 }
 
-rang(){
+brng(){
     # E
     # Name: Broadcast Range Pixels
     # Description: All pixels from 0 to 7.5 IRE and 100-110 IRE will be highlighted as white pixels to illuminate what area(s) of the frame and how many pixels are outside of braodcast range
@@ -421,13 +421,13 @@ rang(){
     # RGBHEX is used for color highlight, default to yellow 0xFFFF00
     RGBHEX=$2
     if [ "$1" = "N" ] ; then
-        filter="signalstats=out=rang:c=$RGBHEX,\
+        filter="signalstats=out=brng:c=$RGBHEX,\
         scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
-        [a1]signalstats=out=rang:c=$RGBHEX[a2];\
-        [b1]signalstats=out=rang:c=$RGBHEX[b2];\
+        [a1]signalstats=out=brng:c=$RGBHEX[a2];\
+        [b1]signalstats=out=brng:c=$RGBHEX[b2];\
         [a2][b2]framepack=tab,\
         scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
@@ -578,7 +578,7 @@ while getopts fH:b:d:kl:m:npq:s:tA:E:J:L:M:N:R:V:o:hZ opt ; do
             ;;
         E)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             highlightcolor=$(echo $OPTARG | cut -d+ -f2)
-            rang ${fieldsplit:-N} ${highlightcolor:-FFFF00}
+            brng ${fieldsplit:-N} ${highlightcolor:-FFFF00}
             ;;
         J)
             fieldsplit=$(echo $OPTARG | cut -d+ -f1)
