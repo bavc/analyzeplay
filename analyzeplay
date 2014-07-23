@@ -65,11 +65,15 @@ fielddiffplay(){
 }
 
 columndiffplay(){
+    # s
     # Name: Column Difference
     # arg1: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
     # arg2: strength, range=0..1, default=0.2, slider
     # arg3: intensity, range=0..1, default=0.2, slider
-    filter="extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2,scale=iw*2:ih,setdar=1:1"
+    width=720
+    height=486
+    dar=4/3
+    filter="extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
 }
 
 framemetadataplay(){
