@@ -30,8 +30,12 @@ usage(){
 
 # filter recipes
 fieldsplitplay(){
+    # f
     # Name: Field Split
-    filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab'"
+    width=720
+    height=486
+    dar=4/3
+    filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
 }
 
 fielddiffplay(){
