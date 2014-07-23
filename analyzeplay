@@ -85,18 +85,28 @@ framemetadataplay(){
 }
 
 histogram(){
+    # H
     # Name: Histogram
     # Description: A histogram display for each channel of the input video (typically either in YUV or RBG).
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: rgb, boolean, default=N, toggle
-    if [ "$1" = "N" -a "$2" = "N" ] ; then
-        filter="histogram'"
-    elif [ "$1" = "Y" -a "$2" = "N" ] ; then
-        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack"
+    # arg3: plane, select of (all, y, u, or v), default=all, radio buttons or toggles, something compact
+    # if rgb=Y then plane has no effect
+    width=720
+    height=486
+    dar=4/3
+    if   [ "$1" = "N" -a "$2" = "N" -a "$3" = "all" ] ; then
+        filter="histogram,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$1" = "Y" -a "$2" = "N" -a "$3" = "all"  ] ; then
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "N" -a "$2" = "Y" ] ; then
-        filter="format=rgb48,histogram"
-    elif [ "$1" = "Y" -a "$2" = "Y" ] ; then
-        filter="format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack"
+        filter="format=rgb48,histogram,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$1" = "Y" -a "$2" = "Y"  ] ; then
+        filter="format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$1" = "N" -a "$2" = "N" -a "$3" != "all" ] ; then
+        filter="extractplanes=$3,histogram,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+    elif [ "$1" = "Y" -a "$2" = "N" -a "$3" != "all"  ] ; then
+        filter="extractplanes=$3,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack,scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
@@ -496,7 +506,8 @@ while getopts fH:b:c:d:kl:m:npq:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
             fielddiffplay ${plane:-v} ${strength:-0.2} ${intensity:-0.2} ${column:-N} ;;
         H)  fieldsplit=$(echo $OPTARG | cut -d+ -f1)
             rgb=$(echo $OPTARG | cut -d+ -f2)
-            histogram ${fieldsplit:-N} ${rgb:-N}
+            plane=$(echo $OPTARG | cut -d+ -f3)
+            histogram ${fieldsplit:-N} ${rgb:-N} ${plane:-all}
             ;;
         b)
             [[ $(echo $OPTARG | grep "\-\?[0-8]+-\?[0-8]+-\?[0-8]") ]] || { echo The bits slice expression must be expression in y+u+v format, such as -b 1+2+3 to show the first bit only of the y plane, second bit of the u plane, and third bit of the v plane. Any value may be set to zero to disable bits or set to -1 to pass all bits. ; exit 1 ;};
