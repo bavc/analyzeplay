@@ -387,19 +387,25 @@ valuehighlight(){
 }
 
 chromaadjust(){
+    # m
     # name: Chroma Adjust
     # description: Similar to a video processing amplifier (proc amp) the hue and saturation levels can be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10.
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: hue, range=0..360, default=0, slider
     # arg3: saturation, range=-10..10, default=1, slider
+    width=720
+    height=486
+    dar=4/3
     if [ "$1" = "N" ] ; then
-        filter="hue=h=$2:s=$3"
+        filter="hue=h=$2:s=$3,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];\
         [b]field=bottom[b1];\
         [a1]hue=h=$2:s=$3[a2];\
         [b1]hue=h=$2:s=$3[b2];\
-        [a2][b2]framepack=tab"
+        [a2][b2]framepack=tab,\
+        scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
     fi
 }
 
