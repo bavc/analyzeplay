@@ -28,6 +28,16 @@ usage(){
     "
 }
 
+normal(){
+    # Z
+    # Uses neighbor and interlace scaling
+    width=720
+    height=486
+    dar=4/3
+    filter="scale=$width:$height:interl=-1:flags=neighbor,setdar=$dar"
+
+}
+
 # filter recipes
 fieldsplitplay(){
     # f
@@ -501,7 +511,7 @@ avectorscope(){
 
 [ "$#" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:h opt ; do
+while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:hZ opt ; do
     case "$opt" in
         f) fieldsplitplay ;;
         d)  plane=$(echo $OPTARG | cut -d+ -f2)
@@ -611,6 +621,7 @@ while getopts fH:b:c:d:egijkl:m:npq:r:s:tA:E:J:L:M:N:P:Q:R:V:o:h opt ; do
             ;;
         o) outputfile="$OPTARG" ;;
         h) usage ; exit 1 ;;
+        Z) normal;;
         \?) usage ; exit 1 ;;
     esac
 done
