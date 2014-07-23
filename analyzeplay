@@ -202,10 +202,14 @@ waveform(){
 }
 
 vectorscope(){
+    # J
     # Name: Vectorscope
     # Description: A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.
     # arg1: fieldsplit, boolean, default=N, toggle
     # arg2: scale, range=1..10, default=1, slider
+    width=720
+    height=486
+    dar=4/3
     [[ $1 -ge -1 && $1 -le 10 ]] || { echo The scale value must be between 1 and 10 ; exit 1 ;};
     if [ "$1" = "N" ] ; then
         filter="histogram=mode=color2,lutyuv=y=val*$2,\
@@ -228,7 +232,8 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
-        drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8"
+        drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,\
+        pad=ih*$dar:ih:(ow-iw)/2:(oh-ih)/2,scale=$width:$height:interl=-1:flags=neighbor,format=rgb24,setdar=$dar"
     elif [ "$1" = "Y" ] ; then
         filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=mode=color2,lutyuv=y=val*$2,\
@@ -273,7 +278,8 @@ vectorscope(){
         drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,\
         drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];\
-        [a2][b2]framepack=tab"
+        [a2][b2]framepack=tab,\
+        pad=ih*$dar:ih:(ow-iw)/2:(oh-ih)/2,scale=$width:$height:interl=-1:flags=neighbor,format=rgb24,setdar=$dar"
     fi
 }
 
