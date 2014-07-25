@@ -448,7 +448,7 @@ zoom(){
     # arg2: y, range=0..$height, default=0.0, slider
     # arg3: s, range=0..$width, default=12, slider
     # arg4: intensity, range=0..1, default=0.0, slider
-    # arg4: strength, range=0..1, default=0.0, slider
+    # arg5: strength, range=0..1, default=0.0, slider
     filter="crop=${3}:${3}/dar:${1}:${2},\
     histeq=strength=${4}:intensity=${5}"
 }
