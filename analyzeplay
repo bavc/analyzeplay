@@ -509,6 +509,17 @@ vrep(){
     fi
 }
 
+tile(){
+    # C
+    # Name: Tile
+    # Description: Display multiple frames at once
+    # arg1: frames, radio button (options: 2x2, 3x3, 4x4, 6x6, 8x8, 10x10), default=6x6
+    width=720
+    height=486
+    dar=4/3
+    filter="scale=iw/4:ih/4,tile=$arrangement"
+}
+
 # filter recipes
 showspectrum(){
     # Name: Audio Spectrum
@@ -535,7 +546,7 @@ avectorscope(){
 
 [ "${#}" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:d:kl:m:npq:s:tA:B:E:J:M:N:R:V:o:hZ opt ; do
+while getopts fH:b:d:kl:m:npq:s:tA:B:C:E:J:M:N:R:V:o:hZ opt ; do
     case "${opt}" in
         f) fieldsplitplay ;;
         d)  plane=$(echo ${OPTARG} | cut -d+ -f2)
@@ -590,6 +601,8 @@ while getopts fH:b:d:kl:m:npq:s:tA:B:E:J:M:N:R:V:o:hZ opt ; do
             scale=$(echo ${OPTARG} | cut -d+ -f2)
             column=$(echo ${OPTARG} | cut -d+ -f3)
             lineselect ${line:-N} ${scale:-20} ${column:-Y} ;;
+        C)  arrangement=$(echo ${OPTARG} | cut -d+ -f1)
+            tile ${arrangement:-5x4} ;;
         E)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
             highlightcolor=$(echo ${OPTARG} | cut -d+ -f2)
             brng ${fieldsplit:-N} ${highlightcolor:-FFFF00}
