@@ -212,14 +212,14 @@ lineselect(){
     height=486
     dar=4/3
     if [ "${3}" = "N" ] ; then
-        filter="crop=iw:1:0:${line},\
+        filter="crop=iw:1:0:${1},\
         histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
         scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
     else
-        filter="transpose=1,crop=iw:1:0:${line},\
+        filter="transpose=1,crop=iw:1:0:${1},\
         histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
