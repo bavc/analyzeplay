@@ -201,6 +201,33 @@ waveform(){
     fi
 }
 
+lineselect(){
+    # B
+    # Name: Line Select
+    # Description: Show a waveform image of a single line of video
+    # arg1: line, non-negative integer, range=1-$height (if column=N) 1-$width (if column=Y), default=1, spinbox/slider
+    # arg2: scale, range=1..255, default=255, slider
+    # arg3: column, boolean, default=N, toggle
+    width=720
+    height=486
+    dar=4/3
+    if [ "${3}" = "N" ] ; then
+        filter="crop=iw:1:0:${line},\
+        histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,\
+        drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
+        drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    else
+        filter="transpose=1,crop=iw:1:0:${line},\
+        histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,\
+        drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
+        drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
+        drawgrid=width=0:height=128:thickness=1:color=green@0.3,\
+        scale=${width}:${height}:interl=-1:flags=neighbor,setdar=${dar}"
+    fi
+}
+
 vectorscope(){
     # J
     # Name: Vectorscope
@@ -508,7 +535,7 @@ avectorscope(){
 
 [ "${#}" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:d:kl:m:npq:s:tA:E:J:M:N:R:V:o:hZ opt ; do
+while getopts fH:b:d:kl:m:npq:s:tA:B:E:J:M:N:R:V:o:hZ opt ; do
     case "${opt}" in
         f) fieldsplitplay ;;
         d)  plane=$(echo ${OPTARG} | cut -d+ -f2)
@@ -559,6 +586,10 @@ while getopts fH:b:d:kl:m:npq:s:tA:E:J:M:N:R:V:o:hZ opt ; do
             horizontal=$(echo ${OPTARG} | cut -d+ -f4)
             waveform ${fieldsplit:-N} ${scale:-20} ${plane:-y} ${horizontal:-V}
             ;;
+        B)  line=$(echo ${OPTARG} | cut -d+ -f1)
+            scale=$(echo ${OPTARG} | cut -d+ -f2)
+            column=$(echo ${OPTARG} | cut -d+ -f3)
+            lineselect ${line:-N} ${scale:-20} ${column:-Y} ;;
         E)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
             highlightcolor=$(echo ${OPTARG} | cut -d+ -f2)
             brng ${fieldsplit:-N} ${highlightcolor:-FFFF00}
