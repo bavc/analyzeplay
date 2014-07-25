@@ -143,7 +143,7 @@ waveform(){
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5"
     elif [ "${1}" = "Y" -a "${3}" != "all" -a "${4}" = "Y" ] ; then
-        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
         crop=iw:256:0:0,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
