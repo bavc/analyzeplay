@@ -517,7 +517,7 @@ tile(){
     width=720
     height=486
     dar=4/3
-    filter="scale=iw/4:ih/4,tile=$arrangement"
+    filter="scale=iw/4:ih/4,tile=${arrangement}"
 }
 
 # filter recipes
