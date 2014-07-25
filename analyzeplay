@@ -520,6 +520,22 @@ tile(){
     filter="scale=iw/4:ih/4,tile=${arrangement}"
 }
 
+zoom(){
+    # D
+    # Name: Zoom
+    # Description: Zoom in on part of the frame
+    # arg1: x, range=0..$width, default=0.0, slider
+    # arg2: y, range=0..$height, default=0.0, slider
+    # arg3: s, range=0..$width, default=12, slider
+    # arg4: intensity, range=0..1, default=0.0, slider
+    # arg4: strength, range=0..1, default=0.0, slider
+    width=720
+    height=486
+    dar=4/3
+    filter="crop=${3}:${3}/dar:${1}:${2},\
+    histeq=strength=${4}:intensity=${5}"
+}
+
 # filter recipes
 showspectrum(){
     # Name: Audio Spectrum
@@ -546,7 +562,7 @@ avectorscope(){
 
 [ "${#}" = 0 ] && { usage ; exit 1 ;};
 movietype="movie"
-while getopts fH:b:d:kl:m:npq:s:tA:B:C:E:J:M:N:R:V:o:hZ opt ; do
+while getopts fH:b:d:kl:m:npq:s:tA:B:C:D:E:J:M:N:R:V:o:hZ opt ; do
     case "${opt}" in
         f) fieldsplitplay ;;
         d)  plane=$(echo ${OPTARG} | cut -d+ -f2)
@@ -603,6 +619,12 @@ while getopts fH:b:d:kl:m:npq:s:tA:B:C:E:J:M:N:R:V:o:hZ opt ; do
             lineselect ${line:-N} ${scale:-20} ${column:-Y} ;;
         C)  arrangement=$(echo ${OPTARG} | cut -d+ -f1)
             tile ${arrangement:-5x4} ;;
+        D)  x=$(echo ${OPTARG} | cut -d+ -f1)
+            y=$(echo ${OPTARG} | cut -d+ -f2)
+            s=$(echo ${OPTARG} | cut -d+ -f3)
+            strength=$(echo ${OPTARG} | cut -d+ -f4)
+            intensity=$(echo ${OPTARG} | cut -d+ -f5)
+            zoom ${x:-0} ${y:-0} ${s:-0} ${strength:-0} ${intensity:-0} ;;
         E)  fieldsplit=$(echo ${OPTARG} | cut -d+ -f1)
             highlightcolor=$(echo ${OPTARG} | cut -d+ -f2)
             brng ${fieldsplit:-N} ${highlightcolor:-FFFF00}
