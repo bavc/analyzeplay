@@ -99,10 +99,16 @@ waveform(){
     # arg3: plane, select of (all, y, u, or v), default=y, radio buttons or toggles, something compact
     # arg4: horizontal, boolean, default=N, toggle
     [[ "${2}" -ge 1 && "${2}" -le 255 ]] || { echo The scale value must be between 1 and 255 ; exit 1 ;};
-    
+    if [ "${3}" = "y" ] ; then
+        cropwfm=0
+    elif [ "${3}" = "u" ] ; then
+        cropwfm=256
+    elif [ "${3}" = "v" ] ; then
+        cropwfm=512
+    fi
     if [ "${1}" = "N" -a "${3}" != "all" -a "${4}" = "N" ] ; then
-        filter="extractplanes=${3},histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
-        crop=iw:256:0:0,\
+        filter="histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        crop=iw:256:0:${cropwfm},\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16"
     elif [ "${1}" = "N" -a "${3}" = "all" -a "${4}" = "N" ] ; then
@@ -111,13 +117,13 @@ waveform(){
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5"
     elif [ "${1}" = "Y" -a "${3}" != "all" -a "${4}" = "N" ] ; then
-        filter="extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
-        crop=iw:256:0:0,\
+        crop=iw:256:0:${cropwfm},\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[a2];\
         [b1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
-        crop=iw:256:0:0,\
+        crop=iw:256:0:${cropwfm},\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
         [a2][b2]framepack=tab"
@@ -133,8 +139,8 @@ waveform(){
         drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];\
         [a2][b2]framepack"
     elif [ "${1}" = "N" -a "${3}" != "all" -a "${4}" = "Y" ] ; then
-        filter="extractplanes=${3},transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
-        crop=iw:256:0:0,\
+        filter="transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
+        crop=iw:256:0:${cropwfm},\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16"
     elif [ "${1}" = "N" -a "${3}" = "all" -a "${4}" = "Y" ] ; then
@@ -143,13 +149,13 @@ waveform(){
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,\
         drawgrid=width=0:height=256:thickness=1:color=white@0.5"
     elif [ "${1}" = "Y" -a "${3}" != "all" -a "${4}" = "Y" ] ; then
-        filter="extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
+        filter="split[a][b];[a]field=top[a1];[b]field=bottom[b1];\
         [a1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
-        crop=iw:256:0:0,\
+        crop=iw:256:0:${cropwfm},\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[a2];\
         [b1]transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,\
-        crop=iw:256:0:0,\
+        crop=iw:256:0:${cropwfm},\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];\
         [a2][b2]framepack=tab"
@@ -175,12 +181,12 @@ lineselect(){
     # arg2: scale, range=1..255, default=255, slider
     # arg3: column, boolean, default=N, toggle
     if [ "${3}" = "N" ] ; then
-        filter="crop=iw:1:0:${1},\
+        filter="crop=iw:2:0:${1},\
         histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16"
     else
-        filter="transpose=1,crop=iw:1:0:${1},\
+        filter="transpose=1,crop=iw:2:0:${1},\
         histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,\
         drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,\
         drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16"
